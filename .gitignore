@@ -1,0 +1,3 @@
+*.o
+bbin2ihex
+bin2ihex
