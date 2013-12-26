@@ -1,14 +1,15 @@
 kk_ihex
 =======
 
-A small library for reading and writing Intel HEX (or IHEX) format.
+A small library for reading and writing Intel HEX (or IHEX) format. See the
+header file `kk_ihex.h` for documentation, or below for simple examples.
 
 ~ [Kimmo Kulovesi](http://arkku.com/), 2013-12-27
 
 Writing
 =======
 
-Writing binary data as IHEX ASCII:
+Basic usage for writing binary data as IHEX ASCII:
 
     struct ihex_state ihex;
     ihex_init(&ihex);
@@ -29,7 +30,7 @@ For a complete example, see the included program `bin2ihex.c`.
 Reading
 =======
 
-Reading ASCII IHEXinto binary data:
+Basic usage for reading ASCII IHEX into binary data:
 
     struct ihex_state ihex;
     ihex_init(&ihex);

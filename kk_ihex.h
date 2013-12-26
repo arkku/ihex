@@ -108,12 +108,16 @@ void ihex_init(struct ihex_state * const ihex);
 
     /*** INPUT ***/
 
+// Begin reading at address 0
 void ihex_begin_read(struct ihex_state *ihex);
 
-// Begin reading at `address` (the lowest 16 bits of which will be ignored)
+// Begin reading at `address` (the lowest 16 bits of which will be ignored);
+// this is required only if the high bytes of the 32-bit starting address
+// are not specified in the input data and they are non-zero
 void ihex_read_at_address(struct ihex_state *ihex, ihex_address_t address);
 
-// Begin reading at `segment`
+// Begin reading at `segment`; this is required only if the initial segment
+// is not specified in the input data and it is non-zero
 void ihex_read_at_segment(struct ihex_state *ihex, ihex_segment_t segment);
 
 // Read a single byte
