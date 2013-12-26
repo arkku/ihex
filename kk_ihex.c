@@ -108,13 +108,13 @@ ihex_linear_address (struct ihex_state *ihex) {
 
 static char *
 ihex_buffer_linear_address (char *w, const ihex_segment_t address_msb) {
-    unsigned int sum = IHEX_EXTENDED_LINEAR_ADDRESS_RECORD;
+    unsigned int sum = IHEX_EXTENDED_LINEAR_ADDRESS_RECORD + 2;
 
-    *w++ = IHEX_START;         // :
-    w = ihex_buffer_byte(w, 0); // data
+    *w++ = IHEX_START;          // :
+    w = ihex_buffer_byte(w, 2); // length
     w = ihex_buffer_byte(w, 0); // address msb
     w = ihex_buffer_byte(w, 0); // address lsb
-    w = ihex_buffer_byte(w, sum); // record type
+    w = ihex_buffer_byte(w, IHEX_EXTENDED_LINEAR_ADDRESS_RECORD); // record type
     w = ihex_buffer_word(w, address_msb, &sum); // high bytes of 32-bit address
     w = ihex_buffer_byte(w, 0x100U - sum); // checksum
     return ihex_buffer_newline(w);
@@ -122,13 +122,13 @@ ihex_buffer_linear_address (char *w, const ihex_segment_t address_msb) {
 
 static char *
 ihex_buffer_segment_address (char *w, const ihex_segment_t segment) {
-    unsigned int sum = IHEX_EXTENDED_SEGMENT_ADDRESS_RECORD;
+    unsigned int sum = IHEX_EXTENDED_SEGMENT_ADDRESS_RECORD + 2;
 
     *w++ = IHEX_START;         // :
-    w = ihex_buffer_byte(w, 0); // data
+    w = ihex_buffer_byte(w, 2); // length
     w = ihex_buffer_byte(w, 0); // address msb
     w = ihex_buffer_byte(w, 0); // address lsb
-    w = ihex_buffer_byte(w, sum); // record type
+    w = ihex_buffer_byte(w, IHEX_EXTENDED_SEGMENT_ADDRESS_RECORD); // record type
     w = ihex_buffer_word(w, segment, &sum); // segment selector
     w = ihex_buffer_byte(w, 0x100U - sum); // checksum
     return ihex_buffer_newline(w);
@@ -140,7 +140,7 @@ ihex_buffer_segment_address (char *w, const ihex_segment_t segment) {
 static char *
 ihex_buffer_end_of_file (char *w) {
     *w++ = IHEX_START;         // :
-    w = ihex_buffer_byte(w, 0); // data
+    w = ihex_buffer_byte(w, 0); // length
     w = ihex_buffer_byte(w, 0); // address msb
     w = ihex_buffer_byte(w, 0); // address lsb
     w = ihex_buffer_byte(w, IHEX_END_OF_FILE_RECORD); // record type

@@ -2,7 +2,7 @@ CC=clang
 CFLAGS=-Wall -std=c99 -pedantic
 
 OBJS = kk_ihex.o
-BINS = bin2ihex bbin2ihex
+BINS = bin2ihex
 
 all: $(BINS)
 

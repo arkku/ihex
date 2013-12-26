@@ -21,6 +21,14 @@
  * may be overwritten immediately after `ihex_flush_buffer` returns;
  * it must be copied if it needs to be preserved.
  *
+ * For outputs larger than 64KiB, 32-bit linear addresses are output. Normally
+ * the initial linear extended address record of zero is NOT written - it can
+ * be forced by setting `ihex->flags |= IHEX_FLAG_ADDRESS_OVERFLOW` before
+ * writing the first byte.
+ *
+ * Gaps in the data may be created by calling `ihex_write_at_address` with the
+ * new starting address without calling `ihex_end_write` in between.
+ *
  *
  * Copyright (c) 2013 Kimmo Kulovesi, http://arkku.com/
  * Provided with absolutely no warranty, use at your own risk only.
@@ -46,7 +54,7 @@ struct ihex_state {
     uint8_t data[IHEX_LINE_LENGTH];
 };
 
-#define IHEX_FLAG_ADDRESS_OVERFLOW  1
+#define IHEX_FLAG_ADDRESS_OVERFLOW  1   // 16-bit address overflow
 
 enum ihex_record_type {
     IHEX_DATA_RECORD,

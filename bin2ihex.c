@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//#define IHEX_WRITE_INITIAL_EXTENDED_ADDRESS_RECORD
+
 int
 main (void) {
     struct ihex_state ihex;
@@ -16,6 +18,9 @@ main (void) {
 
     ihex_init(&ihex);
     ihex_write_at_address(&ihex, 0);
+#ifdef IHEX_WRITE_INITIAL_EXTENDED_ADDRESS_RECORD
+    ihex.flags |= IHEX_FLAG_ADDRESS_OVERFLOW;
+#endif
     while ((count = fread(buf, 1, sizeof(buf), stdin))) {
         ihex_write_bytes(&ihex, buf, count);
     }
