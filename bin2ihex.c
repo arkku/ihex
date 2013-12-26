@@ -1,5 +1,5 @@
 /*
- * bin2ihex.c: Read binary data from stdin, output in IHEX format.
+ * bbin2ihex.c: Read binary data from stdin, output in IHEX format.
  *
  * By Kimmo Kulovesi, http://arkku.com
  */
@@ -10,13 +10,14 @@
 
 int
 main (void) {
-    int c;
     struct ihex_state ihex;
+    size_t count;
+    uint8_t buf[1024];
 
     ihex_init(&ihex);
     ihex_write_at_address(&ihex, 0);
-    while ((c = fgetc(stdin)) != EOF) {
-        ihex_write_byte(&ihex, c);
+    while ((count = fread(buf, 1, sizeof(buf), stdin))) {
+        ihex_write_bytes(&ihex, buf, count);
     }
     ihex_end_write(&ihex);
 
