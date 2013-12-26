@@ -92,6 +92,15 @@ void ihex_flush_buffer(char *buffer, char *eptr);
  *      }
  */
 
+// As `ihex_write_at_address`, but specify a segment selector. Note that
+// segments are not automatically incremented when the 16-bit address
+// overflows, because the default is to use 32-bit addressing. For segmented
+// 20-bit addressing you must manually ensure that a write does not overflow
+// the 16-bit address and call `ihex_write_at_segment` every time the segment
+// needs to be changed.
+void ihex_write_at_segment(struct ihex_state *ihex, ihex_segment_t segment,
+                           ihex_address_t address);
+
 // Resolve segmented address (if any), return the linear address
 ihex_address_t ihex_linear_address(struct ihex_state *ihex);
 

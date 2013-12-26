@@ -1,7 +1,7 @@
 #include "kk_ihex.h"
 
 static const char IHEX_START = ':';
-static const char IHEX_NEWLINE[] = "\n";
+static const char IHEX_NEWLINE[] = "\n"; // end of line, e.g., "\n" or "\r\n"
 
 #define ADDRESS_HIGH_MASK 0xFFFF0000U
 #define ADDRESS_HIGH_BYTES(addr) ((addr) >> 16)
@@ -20,21 +20,21 @@ ihex_init (struct ihex_state * const ihex) {
 
 static char *
 ihex_buffer_byte (char *w, const unsigned int byte) {
-    unsigned int n = (byte & 0xF0U) >> 4;
+    unsigned int n = (byte & 0xF0U) >> 4; // high nybble
     *w++ = HEX_DIGIT(n);
-    n = byte & 0x0FU;
+    n = byte & 0x0FU; // low nybble
     *w++ = HEX_DIGIT(n);
     return w;
 }
 
 static char *
 ihex_buffer_word (char *w, const unsigned int word, unsigned int * const checksum) {
-    unsigned int byte = (word & 0xFF00U) >> 8;
-    w = ihex_buffer_byte(w, byte); // msb
+    unsigned int byte = (word & 0xFF00U) >> 8; // high byte
+    w = ihex_buffer_byte(w, byte);
     *checksum += byte;
-    byte = word & 0x00FFU;
+    byte = word & 0x00FFU; // low byte
     *checksum += byte;
-    return ihex_buffer_byte(w, byte); // lsb
+    return ihex_buffer_byte(w, byte);
 }
 
 static char *
@@ -72,7 +72,7 @@ ihex_buffer_data (char *w, struct ihex_state * const ihex) {
         unsigned int addr = ihex->address & 0xFFFFU;
         ihex->address += len;
         if ((0xFFFFU - addr) < len) {
-            // signal overflow (need to write extended address after)
+            // signal overflow (need to write extended address record)
             ihex->flags |= IHEX_FLAG_ADDRESS_OVERFLOW;
         }
         w = ihex_buffer_word(w, addr, &sum);
@@ -80,7 +80,7 @@ ihex_buffer_data (char *w, struct ihex_state * const ihex) {
 
     // record type
     w = ihex_buffer_byte(w, IHEX_DATA_RECORD);
-    sum += IHEX_DATA_RECORD; // NOP
+    //sum += IHEX_DATA_RECORD; // IHEX_DATA_RECORD is zero, so NOP
 
     // data
     do {
@@ -107,29 +107,16 @@ ihex_linear_address (struct ihex_state *ihex) {
 }
 
 static char *
-ihex_buffer_linear_address (char *w, const ihex_segment_t address_msb) {
-    unsigned int sum = IHEX_EXTENDED_LINEAR_ADDRESS_RECORD + 2;
+ihex_buffer_extended_address (char *w, const ihex_segment_t address,
+                              const enum ihex_record_type type) {
+    unsigned int sum = type + 2;
 
     *w++ = IHEX_START;          // :
     w = ihex_buffer_byte(w, 2); // length
     w = ihex_buffer_byte(w, 0); // address msb
     w = ihex_buffer_byte(w, 0); // address lsb
-    w = ihex_buffer_byte(w, IHEX_EXTENDED_LINEAR_ADDRESS_RECORD); // record type
-    w = ihex_buffer_word(w, address_msb, &sum); // high bytes of 32-bit address
-    w = ihex_buffer_byte(w, 0x100U - sum); // checksum
-    return ihex_buffer_newline(w);
-}
-
-static char *
-ihex_buffer_segment_address (char *w, const ihex_segment_t segment) {
-    unsigned int sum = IHEX_EXTENDED_SEGMENT_ADDRESS_RECORD + 2;
-
-    *w++ = IHEX_START;         // :
-    w = ihex_buffer_byte(w, 2); // length
-    w = ihex_buffer_byte(w, 0); // address msb
-    w = ihex_buffer_byte(w, 0); // address lsb
-    w = ihex_buffer_byte(w, IHEX_EXTENDED_SEGMENT_ADDRESS_RECORD); // record type
-    w = ihex_buffer_word(w, segment, &sum); // segment selector
+    w = ihex_buffer_byte(w, type); // record type
+    w = ihex_buffer_word(w, address, &sum); // high bytes of 32-bit address
     w = ihex_buffer_byte(w, 0x100U - sum); // checksum
     return ihex_buffer_newline(w);
 }
@@ -139,7 +126,7 @@ ihex_buffer_segment_address (char *w, const ihex_segment_t segment) {
 
 static char *
 ihex_buffer_end_of_file (char *w) {
-    *w++ = IHEX_START;         // :
+    *w++ = IHEX_START;          // :
     w = ihex_buffer_byte(w, 0); // length
     w = ihex_buffer_byte(w, 0); // address msb
     w = ihex_buffer_byte(w, 0); // address lsb
@@ -151,7 +138,9 @@ ihex_buffer_end_of_file (char *w) {
 static void
 ihex_check_address_overflow (struct ihex_state *ihex) {
     if (ihex->flags & IHEX_FLAG_ADDRESS_OVERFLOW) {
-        char *w = ihex_buffer_linear_address(line_buffer, ADDRESS_HIGH_BYTES(ihex->address));
+        char *w = ihex_buffer_extended_address(line_buffer,
+                    ADDRESS_HIGH_BYTES(ihex->address),
+                    IHEX_EXTENDED_LINEAR_ADDRESS_RECORD);
         ihex_flush_buffer(line_buffer, w);
         ihex->flags &= ~IHEX_FLAG_ADDRESS_OVERFLOW;
     }
@@ -165,18 +154,24 @@ ihex_write_at_address (struct ihex_state *ihex, ihex_address_t address) {
         char *w = ihex_buffer_data(line_buffer, ihex);
         ihex_flush_buffer(line_buffer, w);
     }
-    if (ihex->segment) {
-        // clear segment
-        char *w = ihex_buffer_segment_address(line_buffer, (ihex->segment = 0));
-        ihex_flush_buffer(line_buffer, w);
-        ihex->segment = 0;
-    }
     if ((ihex->address & ADDRESS_HIGH_MASK) != (address & ADDRESS_HIGH_MASK)) {
         ihex->flags |= IHEX_FLAG_ADDRESS_OVERFLOW;
     } else {
         ihex->flags &= ~IHEX_FLAG_ADDRESS_OVERFLOW;
     }
     ihex->address = address;
+}
+
+void
+ihex_write_at_segment (struct ihex_state *ihex, ihex_segment_t segment, ihex_address_t address) {
+    ihex_write_at_address(ihex, address);
+    if (ihex->segment != segment) {
+        // clear segment
+        char *w = ihex_buffer_extended_address(line_buffer,
+                    (ihex->segment = segment),
+                    IHEX_EXTENDED_SEGMENT_ADDRESS_RECORD);
+        ihex_flush_buffer(line_buffer, w);
+    }
 }
 
 void
