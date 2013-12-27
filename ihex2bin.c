@@ -78,8 +78,8 @@ bool ihex_data_read (struct ihex_state *ihex,
         }
         file_position += ihex->length;
     } else if (type == IHEX_END_OF_FILE_RECORD) {
-        (void) fprintf(stderr, "%lu bytes written\n", file_position);
         if (outfile != stdout) {
+            (void) fprintf(stderr, "%lu bytes written\n", file_position);
             (void) fclose(outfile);
         }
         outfile = NULL;
