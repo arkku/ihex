@@ -11,7 +11,7 @@
 #include "kk_ihex.h"
 
 static const char IHEX_START = ':';
-static const char IHEX_NEWLINE[] = "\n"; // end of line, e.g., "\n" or "\r\n"
+static const char IHEX_NEWLINE[] = IHEX_NEWLINE_STRING;
 
 #define ADDRESS_HIGH_MASK 0xFFFF0000U
 #define ADDRESS_HIGH_BYTES(addr) ((addr) >> 16)
@@ -47,7 +47,7 @@ ihex_init (struct ihex_state * const ihex) {
     ihex->line_length = IHEX_DEFAULT_OUTPUT_LINE_LENGTH;
 }
 
-#ifndef KK_IHEX_DISABLE_WRITING
+#ifndef IHEX_DISABLE_WRITING
 
 static char line_buffer[1+2+4+2+IHEX_LINE_MAX_LENGTH+2+sizeof(IHEX_NEWLINE)];
 
@@ -253,9 +253,9 @@ ihex_write_bytes (struct ihex_state *ihex, uint8_t *data, unsigned int count) {
     } while (count);
 }
 
-#endif // !KK_IHEX_DISABLE_WRITING
+#endif // !IHEX_DISABLE_WRITING
 
-#ifndef KK_IHEX_DISABLE_READING
+#ifndef IHEX_DISABLE_READING
 
 void
 ihex_begin_read (struct ihex_state *ihex) {
@@ -405,7 +405,7 @@ ihex_read_bytes (struct ihex_state *ihex, char *data, unsigned int count) {
     }
 }
 
-#endif // !KK_IHEX_DISABLE_READING
+#endif // !IHEX_DISABLE_READING
 
 ihex_address_t
 ihex_linear_address (struct ihex_state *ihex) {

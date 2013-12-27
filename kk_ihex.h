@@ -58,6 +58,23 @@
  * (but multiple writes may be interleaved).
  *
  *
+ *      CONSERVING MEMORY
+ *      -----------------
+ *
+ * For memory-critical use, you can save additional memory by defining
+ * `IHEX_LINE_MAX_LENGTH` as something less than 255. Note, however, that
+ * this limit affects both reading and writing, so the resulting library
+ * will be unable to read lines with more than this number of data bytes.
+ * That said, I haven't encountered any IHEX files with more than 32
+ * data bytes per line.
+ *
+ * If you are using only reading or only writing, the other functionality
+ * can be disabled by defining `IHEX_DISABLE_READING` for write-only or
+ * `IHEX_DISABLE_WRITING` for read-only. In case of write-only, it is
+ * also advantageous to define `IHEX_LINE_MAX_LENGTH` as equal to the line
+ * length that you'll be writing (usually 32 or 16).
+ *
+ *
  * Copyright (c) 2013 Kimmo Kulovesi, http://arkku.com/
  * Provided with absolutely no warranty, use at your own risk only.
  * Use and distribute freely, mark modified copies as such.
@@ -76,10 +93,21 @@ typedef uint_least16_t ihex_segment_t;
 // writing!); specify 255 to support reading all possible lengths. Less
 // can be used to limit memory footprint on embedded systems, e.g.,
 // most programs with IHEX output use 32.
+#ifndef IHEX_LINE_MAX_LENGTH
 #define IHEX_LINE_MAX_LENGTH 255
+#endif
 
 // Default number of data bytes written per line
+#if IHEX_LINE_MAX_LENGTH >= 32
 #define IHEX_DEFAULT_OUTPUT_LINE_LENGTH 32
+#else
+#define IHEX_DEFAULT_OUTPUT_LINE_LENGTH IHEX_LINE_MAX_LENGTH
+#endif
+
+// The newline string (appended to every output line)
+#ifndef IHEX_NEWLINE_STRING
+#define IHEX_NEWLINE_STRING "\n"
+#endif
 
 typedef struct ihex_state {
     ihex_address_t address;
@@ -104,7 +132,7 @@ enum ihex_record_type {
 // Initialise the structure `ihex`
 void ihex_init(struct ihex_state * const ihex);
 
-#ifndef KK_IHEX_DISABLE_READING
+#ifndef IHEX_DISABLE_READING
 
     /*** INPUT ***/
 
@@ -163,8 +191,8 @@ extern bool ihex_data_read(struct ihex_state *ihex,
                            enum ihex_record_type type,
                            bool checksum_mismatch);
 
-#endif // !KK_IHEX_DISABLE_READING
-#ifndef KK_IHEX_DISABLE_WRITING
+#endif // !IHEX_DISABLE_READING
+#ifndef IHEX_DISABLE_WRITING
 
     /*** OUTPUT ***/
 
@@ -216,7 +244,7 @@ void ihex_write_at_segment(struct ihex_state *ihex, ihex_segment_t segment,
 // is IHEX_LINE_MAX_LENGTH (which may be changed at compile time).
 void ihex_set_output_line_length(struct ihex_state *ihex, uint8_t line_length);
 
-#endif // !KK_IHEX_DISABLE_WRITING
+#endif // !IHEX_DISABLE_WRITING
 
 // Resolve segmented address (if any), return the linear address
 ihex_address_t ihex_linear_address(struct ihex_state *ihex);
