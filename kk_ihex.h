@@ -81,14 +81,14 @@ typedef uint_least16_t ihex_segment_t;
 // Default number of data bytes written per line
 #define IHEX_DEFAULT_OUTPUT_LINE_LENGTH 32
 
-struct ihex_state {
+typedef struct ihex_state {
     ihex_address_t address;
     ihex_segment_t segment;
     uint8_t flags;
     uint8_t line_length;
     uint8_t length;
     uint8_t data[IHEX_LINE_MAX_LENGTH + 1];
-};
+} kk_ihex_t;
 
 #define IHEX_FLAG_ADDRESS_OVERFLOW  0x80    // 16-bit address overflow
 

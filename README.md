@@ -1,8 +1,13 @@
 kk_ihex
 =======
 
-A small library for reading and writing Intel HEX (or IHEX) format. See the
-header file `kk_ihex.h` for documentation, or below for simple examples.
+A small library for reading and writing the
+[Intel HEX](http://en.wikipedia.org/wiki/Intel_HEX) (or IHEX) format. The
+library is mainly intended for embedded systems and microcontrollers, such
+as Arduino, AVR, PIC, ARM, STM32, etc - hence the emphasis is on small size
+rather than features, generality, or error handling.
+
+See the header file `kk_ihex.h` for documentation, or below for simple examples.
 
 ~ [Kimmo Kulovesi](http://arkku.com/), 2013-12-27
 
@@ -39,7 +44,7 @@ Basic usage for reading ASCII IHEX into binary data:
     ihex_end_read(&ihex);
 
 The reading functions call the function `ihex_data_read`, which must be
-implemented by the caller to store the binary data, e.g., as follows;
+implemented by the caller to store the binary data, e.g., as follows:
 
     bool ihex_data_read (struct ihex_state *ihex,
                          enum ihex_record_type type,
