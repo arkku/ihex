@@ -9,12 +9,14 @@ BINS = bin2ihex ihex2bin
 all: $(BINS)
 
 $(OBJS): kk_ihex.h
+kk_ihex_write.o: kk_ihex_write.h
+kk_ihex_read.o: kk_ihex_read.h
 
-bin2ihex: bin2ihex.c kk_ihex_write.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $(CFLAGS_WRITEONLY) -o $@ $+
+bin2ihex: bin2ihex.c kk_ihex_write.o
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $+
 
-ihex2bin: ihex2bin.c kk_ihex_read.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $(CFLAGS_READONLY) -o $@ $+
+ihex2bin: ihex2bin.c kk_ihex_read.o
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $+
 
 clean:
 	rm -f $(OBJS)
