@@ -1,0 +1,14 @@
+#!/bin/sh
+if [ -r "$1" ]; then
+    testfile="$1"
+else
+    testfile=bin2ihex
+fi
+set -e
+set -o pipefail
+echo "Testing with file \"$testfile\"..." >&2
+if ./bin2ihex <"$testfile" | ./ihex2bin | diff "$testfile" -; then
+    echo 'success' >&2
+else
+    echo 'FAILED!' >&2
+fi
