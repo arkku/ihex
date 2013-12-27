@@ -1,5 +1,5 @@
 CC=clang
-CFLAGS=-Wall -std=c99 -pedantic
+CFLAGS=-Wall -std=c99 -pedantic -Wextra
 
 OBJS = kk_ihex.o kk_ihex_write.o kk_ihex_read.o
 BINS = bin2ihex ihex2bin

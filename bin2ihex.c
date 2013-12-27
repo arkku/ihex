@@ -31,6 +31,8 @@ main (void) {
     return EXIT_SUCCESS;
 }
 
+#pragma clang diagnostic ignored "-Wunused-parameter"
+
 void ihex_flush_buffer(struct ihex_state *ihex, char *buffer, char *eptr) {
     *eptr = '\0';
     (void) fputs(buffer, stdout);
