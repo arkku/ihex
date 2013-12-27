@@ -16,6 +16,8 @@ Writing
 
 Basic usage for writing binary data as IHEX ASCII:
 
+    #include "kk_ihex_write.h"
+     
     struct ihex_state ihex;
     ihex_init(&ihex);
     ihex_write_at_address(&ihex, 0);
@@ -37,8 +39,9 @@ Reading
 
 Basic usage for reading ASCII IHEX into binary data:
 
+    #include "kk_ihex_read.h"
+     
     struct ihex_state ihex;
-    ihex_init(&ihex);
     ihex_begin_read(&ihex);
     ihex_read_bytes(&ihex, my_ascii_bytes, my_ascii_length);
     ihex_end_read(&ihex);
@@ -50,7 +53,7 @@ implemented by the caller to store the binary data, e.g., as follows:
                          enum ihex_record_type type,
                          bool checksum_error) {
         if (type == IHEX_DATA_RECORD) {
-            unsigned long address = (unsigned long) ihex_linear_address(ihex);
+            unsigned long address = (unsigned long) IHEX_LINEAR_ADDRESS(ihex);
             (void) fseek(outfile, address, SEEK_SET);
             (void) fwrite(ihex->data, ihex->length, 1, outfile);
         } else if (type == IHEX_END_OF_FILE_RECORD) {

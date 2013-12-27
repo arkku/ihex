@@ -1,5 +1,5 @@
 /*
- * kk_ihex.c: A simple library to read and write Intel HEX data.
+ * kk_ihex_write.c: A simple library for writing the Intel HEX (IHEX) format.
  *
  * See the header `kk_ihex.h` for instructions.
  *
@@ -8,7 +8,7 @@
  * Use and distribute freely, mark modified copies as such.
  */
 
-#include "kk_ihex.h"
+#include "kk_ihex_write.h"
 
 static const char IHEX_START = ':';
 static const char IHEX_NEWLINE[] = IHEX_NEWLINE_STRING;
@@ -18,25 +18,11 @@ static const char IHEX_NEWLINE[] = IHEX_NEWLINE_STRING;
 
 #define HEX_DIGIT(n) ((n) + ( ((n) < 10) ? '0' : ('A' - 10)))
 
-enum ihex_read_state {
-    READ_WAIT_FOR_START = 1,
-    READ_COUNT_HIGH,
-    READ_COUNT_LOW,
-    READ_ADDRESS_MSB_HIGH,
-    READ_ADDRESS_MSB_LOW,
-    READ_ADDRESS_LSB_HIGH,
-    READ_ADDRESS_LSB_LOW,
-    READ_RECORD_TYPE_HIGH,
-    READ_RECORD_TYPE_LOW,
-    READ_DATA_HIGH,
-    READ_DATA_LOW,
-    READ_CHECKSUM_HIGH,
-    READ_CHECKSUM_LOW
-};
+static char line_buffer[1+2+4+2+(IHEX_MAX_OUTPUT_LINE_LENGTH*2)+2+sizeof(IHEX_NEWLINE)];
 
-#define IHEX_READ_RECORD_TYPE_MASK 0x07
-#define IHEX_READ_STATE_MASK 0x78
-#define IHEX_READ_STATE_OFFSET 3
+#if IHEX_MAX_OUTPUT_LINE_LENGTH > IHEX_LINE_MAX_LENGTH
+#error "IHEX_MAX_OUTPUT_LINE_LENGTH > IHEX_LINE_MAX_LENGTH"
+#endif
 
 void
 ihex_init (struct ihex_state * const ihex) {
@@ -46,10 +32,6 @@ ihex_init (struct ihex_state * const ihex) {
     ihex->flags = 0;
     ihex->line_length = IHEX_DEFAULT_OUTPUT_LINE_LENGTH;
 }
-
-#ifndef IHEX_DISABLE_WRITING
-
-static char line_buffer[1+2+4+2+IHEX_LINE_MAX_LENGTH+2+sizeof(IHEX_NEWLINE)];
 
 static char *
 ihex_buffer_byte (char *w, const unsigned int byte) {
@@ -188,8 +170,8 @@ ihex_write_at_address (struct ihex_state *ihex, ihex_address_t address) {
 
 void
 ihex_set_output_line_length (struct ihex_state *ihex, uint8_t line_length) {
-    if (line_length > IHEX_LINE_MAX_LENGTH) {
-        line_length = IHEX_LINE_MAX_LENGTH;
+    if (line_length > IHEX_MAX_OUTPUT_LINE_LENGTH) {
+        line_length = IHEX_MAX_OUTPUT_LINE_LENGTH;
     } else if (!line_length) {
         line_length = IHEX_DEFAULT_OUTPUT_LINE_LENGTH;
     }
@@ -251,168 +233,5 @@ ihex_write_bytes (struct ihex_state *ihex, uint8_t *data, unsigned int count) {
             ihex_flush_buffer(ihex, line_buffer, w);
         }
     } while (count);
-}
-
-#endif // !IHEX_DISABLE_WRITING
-
-#ifndef IHEX_DISABLE_READING
-
-void
-ihex_begin_read (struct ihex_state *ihex) {
-    ihex->line_length = 0;
-    ihex->length = 0;
-    ihex->flags = 0;
-}
-
-void
-ihex_read_at_address (struct ihex_state *ihex, ihex_address_t address) {
-    ihex_begin_read(ihex);
-    ihex->address = address;
-}
-
-void
-ihex_read_at_segment (struct ihex_state *ihex, ihex_segment_t segment) {
-    ihex_begin_read(ihex);
-    ihex->address = 0;
-    ihex->segment = segment;
-}
-
-void
-ihex_end_read (struct ihex_state *ihex) {
-    enum ihex_record_type type = ihex->flags & IHEX_READ_RECORD_TYPE_MASK;
-    unsigned int len = ihex->length;
-    if (len == 0 && type == IHEX_DATA_RECORD) {
-        return;
-    }
-    {
-        // compute checksum
-        const uint8_t *r = ihex->data;
-        unsigned int sum = len + type + (ihex->address & 0x00FFU) +
-                           ((ihex->address & 0xFF00U) >> 8);
-        while (len--) {
-            sum += *r++;
-        }
-        ihex->data[IHEX_LINE_MAX_LENGTH] ^= 0x100U - (sum & 0xFF);
-        len = ihex->length;
-    }
-    if (ihex_data_read(ihex, type, ihex->data[IHEX_LINE_MAX_LENGTH] != 0)) {
-        if (type == IHEX_EXTENDED_LINEAR_ADDRESS_RECORD) {
-            ihex_address_t addr = ihex->address & 0xFFFFU;
-            addr |= ((ihex_address_t) ihex->data[0]) << 24;
-            addr |= ((ihex_address_t) ihex->data[1]) << 16;
-            ihex->address = addr;
-        } else if (type == IHEX_EXTENDED_LINEAR_ADDRESS_RECORD) {
-            ihex->segment = ihex->data[0] << 8 | ihex->data[1];
-        }
-    }
-    ihex_begin_read(ihex);
-}
-
-void
-ihex_read_byte (struct ihex_state *ihex, char byte) {
-    enum ihex_read_state state = (ihex->flags & IHEX_READ_STATE_MASK);
-    ihex->flags ^= state; // turn off the old state
-    state >>= IHEX_READ_STATE_OFFSET;
-    if (state && state != READ_WAIT_FOR_START) {
-        int n;
-        if (byte >= '0' && byte <= '9') {
-            n = byte - '0';
-        } else if (byte >= 'A' && byte <= 'F') {
-            n = byte - ('A' - 10);
-        } else if (byte >= 'a' && byte <= 'f') {
-            n = byte - ('a' - 10);
-        } else if (byte == '\n' || byte == '\r' || byte == '\0') {
-            ihex_end_read(ihex);
-            return;
-        } else {
-            goto save_read_state;
-        }
-        if ((state & 1) == (READ_COUNT_HIGH & 1)) {
-            n <<= 4;
-        }
-        switch (state) {
-        case READ_COUNT_HIGH:
-            ihex->line_length = n;
-            ihex->data[IHEX_LINE_MAX_LENGTH] = 0xFF;
-            break;
-        case READ_COUNT_LOW:
-            ihex->line_length |= n;
-            if (ihex->line_length > IHEX_LINE_MAX_LENGTH) {
-                ihex_end_read(ihex);
-                return;
-            }
-            break;
-        case READ_ADDRESS_MSB_HIGH:
-            ihex->address = (ihex->address & ADDRESS_HIGH_MASK) | (n << 8);
-            break;
-        case READ_ADDRESS_MSB_LOW:
-            ihex->address |= n << 8;
-            break;
-        case READ_ADDRESS_LSB_HIGH:
-        case READ_ADDRESS_LSB_LOW:
-            ihex->address |= n;
-            break;
-        case READ_RECORD_TYPE_HIGH:
-            ihex->flags = (ihex->flags & ~IHEX_READ_RECORD_TYPE_MASK);
-        case READ_RECORD_TYPE_LOW:
-            if (n > IHEX_READ_RECORD_TYPE_MASK) {
-                // unknown record type
-                state = READ_WAIT_FOR_START;
-                goto save_read_state;
-            }
-            ihex->flags |= (n & IHEX_READ_RECORD_TYPE_MASK);
-            if (ihex->line_length == 0 && state == READ_RECORD_TYPE_LOW) {
-                state = READ_CHECKSUM_HIGH;
-                goto save_read_state;
-            }
-            break;
-        case READ_DATA_HIGH:
-            ihex->data[ihex->length] = n;
-            break;
-        case READ_DATA_LOW: {
-            unsigned int len = ihex->length;
-            ihex->data[len++] |= n;
-            if (len == ihex->line_length) {
-                state = READ_CHECKSUM_HIGH;
-            } else {
-                state = READ_DATA_HIGH;
-            }
-            ihex->length = len;
-            goto save_read_state;
-        }
-        case READ_CHECKSUM_HIGH:
-            ihex->data[IHEX_LINE_MAX_LENGTH] = n;
-            break;
-        case READ_CHECKSUM_LOW:
-            ihex->data[IHEX_LINE_MAX_LENGTH] |= n;
-            ihex_end_read(ihex);
-        default:
-            state = READ_WAIT_FOR_START;
-            goto save_read_state;
-        }
-        ++state;
-    } else if (byte == IHEX_START) {
-        state = READ_COUNT_HIGH;
-    }
-save_read_state:
-    ihex->flags |= state << IHEX_READ_STATE_OFFSET;
-}
-
-void
-ihex_read_bytes (struct ihex_state *ihex, char *data, unsigned int count) {
-    while (count--) {
-        ihex_read_byte(ihex, *data++);
-    }
-}
-
-#endif // !IHEX_DISABLE_READING
-
-ihex_address_t
-ihex_linear_address (struct ihex_state *ihex) {
-    ihex_address_t address = ihex->address;
-    if (ihex->segment) {
-        address += ((ihex_address_t) ihex->segment) << 4;
-    }
-    return address;
 }
 

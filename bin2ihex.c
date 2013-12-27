@@ -6,11 +6,11 @@
  * Distribute freely, mark modified copies as such.
  */
 
-#include "kk_ihex.h"
+#include "kk_ihex_write.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-//#define KK_IHEX_WRITE_INITIAL_EXTENDED_ADDRESS_RECORD
+//#define IHEX_WRITE_INITIAL_EXTENDED_ADDRESS_RECORD
 
 int
 main (void) {
@@ -20,7 +20,7 @@ main (void) {
 
     ihex_init(&ihex);
     ihex_write_at_address(&ihex, 0);
-#ifdef KK_IHEX_WRITE_INITIAL_EXTENDED_ADDRESS_RECORD
+#ifdef IHEX_WRITE_INITIAL_EXTENDED_ADDRESS_RECORD
     ihex.flags |= IHEX_FLAG_ADDRESS_OVERFLOW;
 #endif
     while ((count = fread(buf, 1, sizeof(buf), stdin))) {
@@ -33,7 +33,8 @@ main (void) {
 
 #pragma clang diagnostic ignored "-Wunused-parameter"
 
-void ihex_flush_buffer(struct ihex_state *ihex, char *buffer, char *eptr) {
+void
+ihex_flush_buffer(struct ihex_state *ihex, char *buffer, char *eptr) {
     *eptr = '\0';
     (void) fputs(buffer, stdout);
 }

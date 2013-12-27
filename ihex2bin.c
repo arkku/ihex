@@ -8,7 +8,7 @@
  * Distribute freely, mark modified copies as such.
  */
 
-#include "kk_ihex.h"
+#include "kk_ihex_read.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -29,7 +29,6 @@ main (int argc, char *argv[]) {
     } else {
         outfile = stdout;
     }
-    ihex_init(&ihex);
     ihex_begin_read(&ihex);
 
     while ((c = fgetc(stdin)) != EOF) {
@@ -41,9 +40,9 @@ main (int argc, char *argv[]) {
     return EXIT_SUCCESS;
 }
 
-bool ihex_data_read (struct ihex_state *ihex,
-                     enum ihex_record_type type,
-                     bool error) {
+bool
+ihex_data_read (struct ihex_state *ihex, enum ihex_record_type type,
+                bool error) {
     if (error) {
         (void) fprintf(stderr, "Checksum error on line %lu\n", line_number);
         exit(EXIT_FAILURE);
@@ -57,7 +56,7 @@ bool ihex_data_read (struct ihex_state *ihex,
         exit(EXIT_FAILURE);
     }
     if (type == IHEX_DATA_RECORD) {
-        unsigned long address = (unsigned long) ihex_linear_address(ihex);
+        unsigned long address = (unsigned long) IHEX_LINEAR_ADDRESS(ihex);
         if (address != file_position) {
             (void) fprintf(stderr, "Seeking from %lu to %lu on line %lu\n",
                            file_position, address, line_number);

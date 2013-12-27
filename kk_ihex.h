@@ -1,7 +1,18 @@
 /*
- * kk_ihex.h: A simple library to read and write Intel HEX data. Intended
- * mainly for embedded systems, and thus somewhat optimised for size at
- * the expense of error handling and generality.
+ * kk_ihex.h: A simple library for reading and writing the Intel HEX 
+ * or IHEX format. Intended mainly for embedded systems, and thus
+ * somewhat optimised for size at the expense of error handling and
+ * generality.
+ *
+ *      USAGE
+ *      -----
+ *
+ * The library has been split into read and write parts, which use a
+ * common data structure (`struct ihex_state`), but each can be used
+ * independently. Include the header `kk_ihex_read.h` for reading, and/or
+ * the header `kk_ihex_write.h` for writing (and link with their respective
+ * object files). Both can be used simultaneously - this header defines
+ * the shared data structures and definitions.
  *
  *
  *      READING INTEL HEX DATA
@@ -16,7 +27,6 @@
  *
  * The sequence to read data in IHEX format is:
  *      struct ihex_state ihex;
- *      ihex_init(&ihex);
  *      ihex_begin_read(&ihex);
  *      ihex_read_bytes(&ihex, my_input_bytes, length_of_my_input_bytes);
  *      ihex_end_read(&ihex);
@@ -66,13 +76,14 @@
  * this limit affects both reading and writing, so the resulting library
  * will be unable to read lines with more than this number of data bytes.
  * That said, I haven't encountered any IHEX files with more than 32
- * data bytes per line.
+ * data bytes per line. For write only there is no reason to define the
+ * maximum as greater than the line length you'll actually be writing,
+ * e.g., 32 or 16.
  *
- * If you are using only reading or only writing, the other functionality
- * can be disabled by defining `IHEX_DISABLE_READING` for write-only or
- * `IHEX_DISABLE_WRITING` for read-only. In case of write-only, it is
- * also advantageous to define `IHEX_LINE_MAX_LENGTH` as equal to the line
- * length that you'll be writing (usually 32 or 16).
+ * If you are doing both reading and writing, you can define the maximum
+ * output length separately as `IHEX_MAX_OUTPUT_LINE_LENGTH` - this will
+ * decrease the write buffer size, but `struct ihex_state` will still
+ * use the larger `IHEX_LINE_MAX_LENGTH` for its data storage.
  *
  *
  * Copyright (c) 2013 Kimmo Kulovesi, http://arkku.com/
@@ -97,18 +108,6 @@ typedef uint_least16_t ihex_segment_t;
 #define IHEX_LINE_MAX_LENGTH 255
 #endif
 
-// Default number of data bytes written per line
-#if IHEX_LINE_MAX_LENGTH >= 32
-#define IHEX_DEFAULT_OUTPUT_LINE_LENGTH 32
-#else
-#define IHEX_DEFAULT_OUTPUT_LINE_LENGTH IHEX_LINE_MAX_LENGTH
-#endif
-
-// The newline string (appended to every output line)
-#ifndef IHEX_NEWLINE_STRING
-#define IHEX_NEWLINE_STRING "\n"
-#endif
-
 typedef struct ihex_state {
     ihex_address_t address;
     ihex_segment_t segment;
@@ -129,124 +128,9 @@ enum ihex_record_type {
     IHEX_START_LINEAR_ADDRESS_RECORD
 };
 
-// Initialise the structure `ihex`
-void ihex_init(struct ihex_state * const ihex);
+// Resolve segmented address (if any)
+#define IHEX_LINEAR_ADDRESS(ihex) ((ihex)->address + (((ihex_address_t)((ihex)->segment)) << 4))
 
-#ifndef IHEX_DISABLE_READING
-
-    /*** INPUT ***/
-
-// Begin reading at address 0
-void ihex_begin_read(struct ihex_state *ihex);
-
-// Begin reading at `address` (the lowest 16 bits of which will be ignored);
-// this is required only if the high bytes of the 32-bit starting address
-// are not specified in the input data and they are non-zero
-void ihex_read_at_address(struct ihex_state *ihex, ihex_address_t address);
-
-// Begin reading at `segment`; this is required only if the initial segment
-// is not specified in the input data and it is non-zero
-void ihex_read_at_segment(struct ihex_state *ihex, ihex_segment_t segment);
-
-// Read a single byte
-void ihex_read_byte(struct ihex_state *ihex, char b);
-
-// Read `count` bytes from `data`
-void ihex_read_bytes(struct ihex_state *ihex, char *data, unsigned int count);
-
-// End reading (may call `ihex_data_read` if there is data waiting)
-void ihex_end_read(struct ihex_state *ihex);
-
-// Called when a complete line has been read, the record type of which is
-// passed as `type`. The `ihex` structure will have its fields `data`,
-// `line_length`, `address`, and `segment` set appropriately. In case
-// of reading an `IHEX_EXTENDED_LINEAR_ADDRESS_RECORD` or an
-// `IHEX_EXTENDED_SEGMENT_ADDRESS_RECORD` the record's data is not
-// yet parsed - it will be parsed into the `address` or `segment` field
-// only if this function returns true.
-//
-// Possible error cases include checksum mismatch (which is indicated
-// as an argument), and excessive line length (in case this has been
-// compiled with `IHEX_LINE_MAX_LENGTH` less than 255) which is indicated
-// by `line_length` greater than `length`. Unknown record types and
-// other erroneous data is usually silently ignored by this minimalistic
-// parser. (It is recommended to compute a hash over the complete data
-// once received and verify that.)
-//
-// Example implementation:
-//
-//      bool ihex_data_read(struct ihex_state *ihex,
-//                          enum ihex_record_type type, bool error) {
-//          error = error || (ihex->length < ihex->line_length);
-//          if (type == IHEX_DATA_RECORD && !error) {
-//              (void) fseek(outfile, ihex_linear_address(ihex), SEEK_SET);
-//              (void) fwrite(ihex->data, 1, ihex->length, outfile);
-//          } else if (type == IHEX_END_OF_FILE_RECORD) {
-//              (void) fclose(outfile);
-//          }
-//          return !error;
-//      }
-//
-extern bool ihex_data_read(struct ihex_state *ihex,
-                           enum ihex_record_type type,
-                           bool checksum_mismatch);
-
-#endif // !IHEX_DISABLE_READING
-#ifndef IHEX_DISABLE_WRITING
-
-    /*** OUTPUT ***/
-
-// Begin writing at the given 32-bit `address`
-// (can also be used to skip to a new address without calling
-// `ihex_end_write`); set ihex->line_length after calling to
-// specify output line length (default 32)
-void ihex_write_at_address(struct ihex_state *ihex, ihex_address_t address);
-
-// Write a single byte
-void ihex_write_byte(struct ihex_state *ihex, uint8_t b);
-
-// Write `count` bytes from `data`
-void ihex_write_bytes(struct ihex_state *ihex, uint8_t *data, unsigned int count);
-
-// End writing (flush buffers, write end of file record)
-void ihex_end_write(struct ihex_state *ihex);
-
-// Called whenever the global, internal write buffer needs to be flushed by
-// the write functions. The implementation is NOT provided by this library;
-// this must be implemented to perform the actual output, i.e., write out
-// `(eptr - buffer)` bytes from `buffer` (which is not NUL-terminated, but
-// may be modified to make it thus).
-//
-// Example implementation:
-//
-//      void ihex_flush_buffer(char *buffer, char *eptr) {
-//          *eptr = '\0';
-//          (void) fputs(buffer, stdout);
-//      }
-//
-// Note that the contents of `buffer` can become invalid immediately after
-// this function returns - the data must be copied if it needs to be preserved!
-//
-extern void ihex_flush_buffer(struct ihex_state *ihex,
-                              char *buffer, char *eptr);
-
-// As `ihex_write_at_address`, but specify a segment selector. Note that
-// segments are not automatically incremented when the 16-bit address
-// overflows, because the default is to use 32-bit addressing. For segmented
-// 20-bit addressing you must manually ensure that a write does not overflow
-// the 16-bit address and call `ihex_write_at_segment` every time the segment
-// needs to be changed.
-void ihex_write_at_segment(struct ihex_state *ihex, ihex_segment_t segment,
-                           ihex_address_t address);
-
-// Set the output line length to `length` - may be safely called only right
-// after `ihex_write_at_address` or `ihex_write_at_segment`. The maximum
-// is IHEX_LINE_MAX_LENGTH (which may be changed at compile time).
-void ihex_set_output_line_length(struct ihex_state *ihex, uint8_t line_length);
-
-#endif // !IHEX_DISABLE_WRITING
-
-// Resolve segmented address (if any), return the linear address
-ihex_address_t ihex_linear_address(struct ihex_state *ihex);
+// See kk_ihex_read.h and kk_ihex_write.h for function declarations!
 
 #endif // !KK_IHEX_H
