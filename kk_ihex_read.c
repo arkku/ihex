@@ -124,14 +124,11 @@ ihex_read_byte (struct ihex_state *ihex, char byte) {
                 ihex_end_read(ihex);
                 return;
             }
-            ihex->data[n] = 0xFF; // poison checksum
             break;
         case READ_ADDRESS_MSB_HIGH:
-            ihex->address = (ihex->address & ADDRESS_HIGH_MASK) | (n << 8);
-            break;
+            ihex->address = (ihex->address & ADDRESS_HIGH_MASK);
         case READ_ADDRESS_MSB_LOW:
-            ihex->address |= n << 8;
-            break;
+            n <<= 8;
         case READ_ADDRESS_LSB_HIGH:
         case READ_ADDRESS_LSB_LOW:
             ihex->address |= n;
@@ -140,7 +137,7 @@ ihex_read_byte (struct ihex_state *ihex, char byte) {
             ihex->flags = (ihex->flags & ~IHEX_READ_RECORD_TYPE_MASK);
         case READ_RECORD_TYPE_LOW:
             if (n > IHEX_READ_RECORD_TYPE_MASK) {
-                // unknown record type
+                // ignore unknown record type
                 state = READ_WAIT_FOR_START;
                 goto save_read_state;
             }
@@ -152,14 +149,12 @@ ihex_read_byte (struct ihex_state *ihex, char byte) {
         case READ_DATA_LOW: {
             unsigned int len = ihex->length;
             ihex->data[len] |= n;
-            if (len == ihex->line_length) {
-                ihex_end_read(ihex);
-                state = READ_WAIT_FOR_START;
-            } else {
+            if (len < ihex->line_length) {
                 ihex->length = len + 1;
                 state = READ_DATA_HIGH;
+                goto save_read_state;
             }
-            goto save_read_state;
+            ihex_end_read(ihex);
         }
         default:
             state = READ_WAIT_FOR_START;
