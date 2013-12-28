@@ -34,11 +34,13 @@ enum ihex_read_state {
 
 void
 ihex_begin_read (struct ihex_state *ihex) {
+    ihex->address = 0;
+#ifndef IHEX_DISABLE_SEGMENTS
+    ihex->segment = 0;
+#endif
+    ihex->flags = (READ_WAIT_FOR_START << IHEX_READ_STATE_OFFSET);
     ihex->line_length = 0;
     ihex->length = 0;
-    ihex->flags = 0;
-    ihex->address = 0;
-    ihex->segment = 0;
 }
 
 void
@@ -47,11 +49,13 @@ ihex_read_at_address (struct ihex_state *ihex, ihex_address_t address) {
     ihex->address = address;
 }
 
+#ifndef IHEX_DISABLE_SEGMENTS
 void
 ihex_read_at_segment (struct ihex_state *ihex, ihex_segment_t segment) {
     ihex_begin_read(ihex);
     ihex->segment = segment;
 }
+#endif
 
 void
 ihex_end_read (struct ihex_state *ihex) {
@@ -77,8 +81,10 @@ ihex_end_read (struct ihex_state *ihex) {
             addr |= ((ihex_address_t) ihex->data[0]) << 24;
             addr |= ((ihex_address_t) ihex->data[1]) << 16;
             ihex->address = addr;
+#ifndef IHEX_DISABLE_SEGMENTS
         } else if (type == IHEX_EXTENDED_LINEAR_ADDRESS_RECORD) {
             ihex->segment = ihex->data[0] << 8 | ihex->data[1];
+#endif
         }
     }
     ihex->length = 0;

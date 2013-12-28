@@ -49,10 +49,6 @@ void ihex_begin_read(struct ihex_state *ihex);
 // are not specified in the input data and they are non-zero
 void ihex_read_at_address(struct ihex_state *ihex, ihex_address_t address);
 
-// Begin reading at `segment`; this is required only if the initial segment
-// is not specified in the input data and it is non-zero
-void ihex_read_at_segment(struct ihex_state *ihex, ihex_segment_t segment);
-
 // Read a single byte
 void ihex_read_byte(struct ihex_state *ihex, char b);
 
@@ -95,5 +91,11 @@ void ihex_end_read(struct ihex_state *ihex);
 extern bool ihex_data_read(struct ihex_state *ihex,
                            enum ihex_record_type type,
                            bool checksum_mismatch);
+
+// Begin reading at `segment`; this is required only if the initial segment
+// is not specified in the input data and it is non-zero
+#ifndef IHEX_DISABLE_SEGMENTS
+void ihex_read_at_segment(struct ihex_state *ihex, ihex_segment_t segment);
+#endif
 
 #endif // !KK_IHEX_READ_H

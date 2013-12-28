@@ -85,6 +85,12 @@
  * decrease the write buffer size, but `struct ihex_state` will still
  * use the larger `IHEX_LINE_MAX_LENGTH` for its data storage.
  *
+ * You can also save a few additional bytes by disabling support for
+ * segmented addresses, by defining `IHEX_DISABLE_SEGMENTS`. Both the
+ * read and write modules need to be build with the same option, as the
+ * resulting data structures will not be compatible otherwise. To be honest,
+ * this is a fairly pointless optimisation.
+ *
  *
  * Copyright (c) 2013 Kimmo Kulovesi, http://arkku.com/
  * Provided with absolutely no warranty, use at your own risk only.
@@ -110,7 +116,9 @@ typedef uint_least16_t ihex_segment_t;
 
 typedef struct ihex_state {
     ihex_address_t address;
+#ifndef IHEX_DISABLE_SEGMENTS
     ihex_segment_t segment;
+#endif
     uint8_t flags;
     uint8_t line_length;
     uint8_t length;
@@ -129,7 +137,11 @@ enum ihex_record_type {
 };
 
 // Resolve segmented address (if any)
+#ifndef IHEX_DISABLE_SEGMENTS
 #define IHEX_LINEAR_ADDRESS(ihex) ((ihex)->address + (((ihex_address_t)((ihex)->segment)) << 4))
+#else
+#define IHEX_LINEAR_ADDRESS(ihex) ((ihex)->address)
+#endif
 
 // See kk_ihex_read.h and kk_ihex_write.h for function declarations!
 

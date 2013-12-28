@@ -124,8 +124,10 @@ extern void ihex_flush_buffer(struct ihex_state *ihex,
 // 20-bit addressing you must manually ensure that a write does not overflow
 // the 16-bit address and call `ihex_write_at_segment` every time the segment
 // needs to be changed.
+#ifndef IHEX_DISABLE_SEGMENTS
 void ihex_write_at_segment(struct ihex_state *ihex, ihex_segment_t segment,
                            ihex_address_t address);
+#endif
 
 // Set the output line length to `length` - may be safely called only right
 // after `ihex_write_at_address` or `ihex_write_at_segment`. The maximum

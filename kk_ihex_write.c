@@ -27,7 +27,9 @@ static char line_buffer[1+2+4+2+(IHEX_MAX_OUTPUT_LINE_LENGTH*2)+2+sizeof(IHEX_NE
 void
 ihex_init (struct ihex_state * const ihex) {
     ihex->address = 0;
+#ifndef IHEX_DISABLE_SEGMENTS
     ihex->segment = 0;
+#endif
     ihex->length = 0;
     ihex->flags = 0;
     ihex->line_length = IHEX_DEFAULT_OUTPUT_LINE_LENGTH;
@@ -178,6 +180,7 @@ ihex_set_output_line_length (struct ihex_state *ihex, uint8_t line_length) {
     ihex->line_length = line_length;
 }
 
+#ifndef IHEX_DISABLE_SEGMENTS
 void
 ihex_write_at_segment (struct ihex_state *ihex, ihex_segment_t segment, ihex_address_t address) {
     ihex_write_at_address(ihex, address);
@@ -189,6 +192,7 @@ ihex_write_at_segment (struct ihex_state *ihex, ihex_segment_t segment, ihex_add
         ihex_flush_buffer(ihex, line_buffer, w);
     }
 }
+#endif
 
 void
 ihex_write_byte (struct ihex_state *ihex, uint8_t byte) {
