@@ -50,7 +50,7 @@ void ihex_begin_read(struct ihex_state *ihex);
 void ihex_read_at_address(struct ihex_state *ihex, ihex_address_t address);
 
 // Read a single byte
-void ihex_read_byte(struct ihex_state *ihex, char b);
+void ihex_read_byte(struct ihex_state *ihex, int c);
 
 // Read `count` bytes from `data`
 void ihex_read_bytes(struct ihex_state *ihex, char *data, unsigned int count);

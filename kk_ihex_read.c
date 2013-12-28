@@ -12,10 +12,10 @@
 
 #define IHEX_START ':'
 
-#define ADDRESS_HIGH_MASK 0xFFFF0000U
+#define ADDRESS_HIGH_MASK ((ihex_address_t) 0xFFFF0000U)
 
 enum ihex_read_state {
-    READ_WAIT_FOR_START = 1,
+    READ_WAIT_FOR_START,
     READ_COUNT_HIGH,
     READ_COUNT_LOW,
     READ_ADDRESS_MSB_HIGH,
@@ -38,7 +38,7 @@ ihex_begin_read (struct ihex_state *ihex) {
 #ifndef IHEX_DISABLE_SEGMENTS
     ihex->segment = 0;
 #endif
-    ihex->flags = (READ_WAIT_FOR_START << IHEX_READ_STATE_OFFSET);
+    ihex->flags = 0;
     ihex->line_length = 0;
     ihex->length = 0;
 }
@@ -58,9 +58,10 @@ ihex_read_at_segment (struct ihex_state *ihex, ihex_segment_t segment) {
 #endif
 
 void
-ihex_end_read (struct ihex_state *ihex) {
+ihex_end_read (struct ihex_state * const ihex) {
     enum ihex_record_type type = ihex->flags & IHEX_READ_RECORD_TYPE_MASK;
     unsigned int len = ihex->length;
+    uint8_t * const eptr = ihex->data + len; // checksum stored at the end
     if (len == 0 && type == IHEX_DATA_RECORD) {
         return;
     }
@@ -69,21 +70,19 @@ ihex_end_read (struct ihex_state *ihex) {
         const uint8_t *r = ihex->data;
         unsigned int sum = len + type + (ihex->address & 0x00FFU) +
                            ((ihex->address & 0xFF00U) >> 8);
-        while (len--) {
+        while (r != eptr) {
             sum += *r++;
         }
-        len = ihex->length;
-        ihex->data[len] ^= 0x100U - (sum & 0xFF);
+        *eptr ^= ~sum + 1U;
     }
-    if (ihex_data_read(ihex, type, ihex->data[len] != 0)) {
+    if (ihex_data_read(ihex, type, *eptr)) {
         if (type == IHEX_EXTENDED_LINEAR_ADDRESS_RECORD) {
-            ihex_address_t addr = ihex->address & 0xFFFFU;
-            addr |= ((ihex_address_t) ihex->data[0]) << 24;
-            addr |= ((ihex_address_t) ihex->data[1]) << 16;
-            ihex->address = addr;
+            ihex->address &= 0xFFFFU;
+            ihex->address |= ((ihex_address_t) ihex->data[0]) << 24;
+            ihex->address |= ((ihex_address_t) ihex->data[1]) << 16;
 #ifndef IHEX_DISABLE_SEGMENTS
-        } else if (type == IHEX_EXTENDED_LINEAR_ADDRESS_RECORD) {
-            ihex->segment = ihex->data[0] << 8 | ihex->data[1];
+        } else if (type == IHEX_EXTENDED_SEGMENT_ADDRESS_RECORD) {
+            ihex->segment = (ihex->data[0] << 8) | ihex->data[1];
 #endif
         }
     }
@@ -92,63 +91,64 @@ ihex_end_read (struct ihex_state *ihex) {
 }
 
 void
-ihex_read_byte (struct ihex_state *ihex, char byte) {
+ihex_read_byte (struct ihex_state *ihex, int b) {
     enum ihex_read_state state = (ihex->flags & IHEX_READ_STATE_MASK);
     ihex->flags ^= state; // turn off the old state
     state >>= IHEX_READ_STATE_OFFSET;
-    if (state && state != READ_WAIT_FOR_START) {
-        int n;
-        if (byte >= '0' && byte <= '9') {
-            n = byte - '0';
-        } else if (byte >= 'A' && byte <= 'F') {
-            n = byte - ('A' - 10);
-        } else if (byte >= 'a' && byte <= 'f') {
-            n = byte - ('a' - 10);
-        } else if (byte == '\n' || byte == '\r' || byte == '\0') {
+    if (state != READ_WAIT_FOR_START) {
+        if (b >= '0' && b <= '9') {
+            b -= '0';
+        } else if (b >= 'A' && b <= 'F') {
+            b -= 'A' - 10;
+        } else if (b >= 'a' && b <= 'f') {
+            b -= 'a' - 10;
+        } else if (b == '\n' || b == '\r' || b == '\0') {
             ihex_end_read(ihex);
             return;
         } else {
             goto save_read_state;
         }
         if ((state & 1) == (READ_COUNT_HIGH & 1)) {
-            n <<= 4;
+            // states are arranged alternating high/low nybble
+            b <<= 4;
         }
         switch (state) {
         case READ_COUNT_HIGH:
-            ihex->line_length = n;
+            ihex->line_length = b;
             break;
         case READ_COUNT_LOW:
-            n = ihex->line_length | n;
-            ihex->line_length = n;
-            if (n > IHEX_LINE_MAX_LENGTH) {
+            b = ihex->line_length | b;
+            ihex->line_length = b;
+            if (b > IHEX_LINE_MAX_LENGTH) {
                 ihex_end_read(ihex);
                 return;
             }
             break;
         case READ_ADDRESS_MSB_HIGH:
+            // clear the low 16 bits of address
             ihex->address = (ihex->address & ADDRESS_HIGH_MASK);
         case READ_ADDRESS_MSB_LOW:
-            n <<= 8;
+            b <<= 8;
         case READ_ADDRESS_LSB_HIGH:
         case READ_ADDRESS_LSB_LOW:
-            ihex->address |= n;
+            ihex->address |= b;
             break;
         case READ_RECORD_TYPE_HIGH:
             ihex->flags = (ihex->flags & ~IHEX_READ_RECORD_TYPE_MASK);
         case READ_RECORD_TYPE_LOW:
-            if (n > IHEX_READ_RECORD_TYPE_MASK) {
+            if (b > IHEX_READ_RECORD_TYPE_MASK) {
                 // ignore unknown record type
                 state = READ_WAIT_FOR_START;
                 goto save_read_state;
             }
-            ihex->flags |= (n & IHEX_READ_RECORD_TYPE_MASK);
+            ihex->flags |= (b & IHEX_READ_RECORD_TYPE_MASK);
             break;
         case READ_DATA_HIGH:
-            ihex->data[ihex->length] = n;
+            ihex->data[ihex->length] = b;
             break;
         case READ_DATA_LOW: {
             unsigned int len = ihex->length;
-            ihex->data[len] |= n;
+            ihex->data[len] |= b;
             if (len < ihex->line_length) {
                 ihex->length = len + 1;
                 state = READ_DATA_HIGH;
@@ -161,7 +161,7 @@ ihex_read_byte (struct ihex_state *ihex, char byte) {
             goto save_read_state;
         }
         ++state;
-    } else if (byte == IHEX_START) {
+    } else if (b == IHEX_START) {
         state = READ_COUNT_HIGH;
     }
 save_read_state:
