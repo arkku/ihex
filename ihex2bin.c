@@ -9,6 +9,7 @@
  */
 
 #include "kk_ihex_read.h"
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 

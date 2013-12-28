@@ -76,8 +76,8 @@ void ihex_end_read(struct ihex_state *ihex);
 //
 // Example implementation:
 //
-//      bool ihex_data_read(struct ihex_state *ihex,
-//                          enum ihex_record_type type, bool error) {
+//      _Bool ihex_data_read(struct ihex_state *ihex,
+//                          enum ihex_record_type type, _Bool error) {
 //          error = error || (ihex->length < ihex->line_length);
 //          if (type == IHEX_DATA_RECORD && !error) {
 //              (void) fseek(outfile, IHEX_LINEAR_ADDRESS(ihex), SEEK_SET);
@@ -88,9 +88,9 @@ void ihex_end_read(struct ihex_state *ihex);
 //          return !error;
 //      }
 //
-extern bool ihex_data_read(struct ihex_state *ihex,
+extern _Bool ihex_data_read(struct ihex_state *ihex,
                            enum ihex_record_type type,
-                           bool checksum_mismatch);
+                           _Bool checksum_mismatch);
 
 // Begin reading at `segment`; this is required only if the initial segment
 // is not specified in the input data and it is non-zero

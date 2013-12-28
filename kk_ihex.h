@@ -101,7 +101,6 @@
 #define KK_IHEX_H
 
 #include <stdint.h>
-#include <stdbool.h>
 
 typedef uint_least32_t ihex_address_t;
 typedef uint_least16_t ihex_segment_t;
