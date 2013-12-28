@@ -149,12 +149,15 @@ enum ihex_record_type {
 // afterwards.
 //
 // To implement fully "correct" segmented addressing, compute the address
-// of each byte with its index `i` as follows:
+// of each byte with its index as follows:
 //
-// `((ihex->address + i) & 0xFFFF) + (((ihex_address_t) ihex->segment) << 4)`
-//
+#define IHEX_BYTE_ADDRESS(ihex, byte_index) ((((ihex)->address + (byte_index)) & 0xFFFFU) + (((ihex_address_t)((ihex)->segment)) << 4))
+
 #else // IHEX_DISABLE_SEGMENTS:
+
 #define IHEX_LINEAR_ADDRESS(ihex) ((ihex)->address)
+#define IHEX_BYTE_ADDRESS(ihex, byte_index) ((ihex)->address + (byte_index))
+
 #endif
 
 // See kk_ihex_read.h and kk_ihex_write.h for function declarations!
