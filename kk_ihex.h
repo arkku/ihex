@@ -22,8 +22,8 @@
  * of bytes using other means (e.g., stdio). The bytes read must then be
  * passed to `ihex_read_byte` and/or `ihex_read_bytes`. The reading functions
  * will then call `ihex_data_read`, at which stage the `struct ihex_state`
- * structure will contain the data along with its address. See below for
- * details and example implementation of `ihex_data_read`.
+ * structure will contain the data along with its address. See the header
+ * `kk_ihex_read.h` for details and example implementation of `ihex_data_read`.
  *
  * The sequence to read data in IHEX format is:
  *      struct ihex_state ihex;
@@ -41,8 +41,8 @@
  * `ihex_write_bytes`. The writing functions will then call the function
  * `ihex_flush_buffer` whenever the internal write buffer needs to be
  * cleared - it is up to the caller to provide an implementation of
- * `ihex_flush_buffer` to do the actual writing. See below for details
- * and an example implementation.
+ * `ihex_flush_buffer` to do the actual writing. See the header
+ * `kk_ihex_write.h` for details and an example implementation.
  *
  * See the declaration further down for an example implementation.
  *
@@ -135,10 +135,25 @@ enum ihex_record_type {
     IHEX_START_LINEAR_ADDRESS_RECORD
 };
 
-// Resolve segmented address (if any)
+// Resolve segmented address (if any). It is the author's recommendation that
+// segmented addressing not be used (and indeed the write function of this
+// library uses linear 32-bit addressing unless manually overridden).
+//
 #ifndef IHEX_DISABLE_SEGMENTS
 #define IHEX_LINEAR_ADDRESS(ihex) ((ihex)->address + (((ihex_address_t)((ihex)->segment)) << 4))
-#else
+//
+// Note that segmented addressing with this macro is not strictly adherent to 
+// the IHEX specification, which mandates that the/ lowest 16 bits of the
+// address and the index of the data byte must be added modulo 64K (i.e.,
+// at 16 bits precision with wraparound) and the segment address only added
+// afterwards.
+//
+// To implement fully "correct" segmented addressing, compute the address
+// of each byte with its index `i` as follows:
+//
+// `((ihex->address + i) & 0xFFFF) + (((ihex_address_t) ihex->segment) << 4)`
+//
+#else // IHEX_DISABLE_SEGMENTS:
 #define IHEX_LINEAR_ADDRESS(ihex) ((ihex)->address)
 #endif
 

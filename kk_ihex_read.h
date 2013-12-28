@@ -64,7 +64,8 @@ void ihex_end_read(struct ihex_state *ihex);
 // of reading an `IHEX_EXTENDED_LINEAR_ADDRESS_RECORD` or an
 // `IHEX_EXTENDED_SEGMENT_ADDRESS_RECORD` the record's data is not
 // yet parsed - it will be parsed into the `address` or `segment` field
-// only if this function returns true.
+// only if `ihex_data_read` returns `true`. This allows manual handling
+// of extended addresses by parsing the `ihex->data` bytes.
 //
 // Possible error cases include checksum mismatch (which is indicated
 // as an argument), and excessive line length (in case this has been
@@ -72,7 +73,7 @@ void ihex_end_read(struct ihex_state *ihex);
 // by `line_length` greater than `length`. Unknown record types and
 // other erroneous data is usually silently ignored by this minimalistic
 // parser. (It is recommended to compute a hash over the complete data
-// once received and verify that.)
+// once received and verify that against the source).
 //
 // Example implementation:
 //
@@ -93,7 +94,8 @@ extern _Bool ihex_data_read(struct ihex_state *ihex,
                            _Bool checksum_mismatch);
 
 // Begin reading at `segment`; this is required only if the initial segment
-// is not specified in the input data and it is non-zero
+// is not specified in the input data and it is non-zero.
+//
 #ifndef IHEX_DISABLE_SEGMENTS
 void ihex_read_at_segment(struct ihex_state *ihex, ihex_segment_t segment);
 #endif
