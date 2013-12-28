@@ -84,10 +84,12 @@
 // Initialise the structure `ihex` for writing
 void ihex_init(struct ihex_state * const ihex);
 
-// Begin writing at the given 32-bit `address`
-// (can also be used to skip to a new address without calling
-// `ihex_end_write`); set ihex->line_length after calling to
-// specify output line length (default 32)
+// Begin writing at the given 32-bit `address` after writing any
+// pending data at the current address.
+//
+// This can also be used to skip to a new address without calling
+// `ihex_end_write`; this allows writing sparse output.
+//
 void ihex_write_at_address(struct ihex_state *ihex, ihex_address_t address);
 
 // Write a single byte
@@ -120,10 +122,11 @@ extern void ihex_flush_buffer(struct ihex_state *ihex,
 
 // As `ihex_write_at_address`, but specify a segment selector. Note that
 // segments are not automatically incremented when the 16-bit address
-// overflows, because the default is to use 32-bit addressing. For segmented
+// overflows (the default is to use 32-bit linear addressing). For segmented
 // 20-bit addressing you must manually ensure that a write does not overflow
-// the 16-bit address and call `ihex_write_at_segment` every time the segment
-// needs to be changed.
+// the segment boundary, and call `ihex_write_at_segment` to every time the
+// segment needs to be changed.
+//
 #ifndef IHEX_DISABLE_SEGMENTS
 void ihex_write_at_segment(struct ihex_state *ihex, ihex_segment_t segment,
                            ihex_address_t address);
