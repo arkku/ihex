@@ -91,7 +91,7 @@ void ihex_init(struct ihex_state * const ihex);
 void ihex_write_at_address(struct ihex_state *ihex, ihex_address_t address);
 
 // Write a single byte
-void ihex_write_byte(struct ihex_state *ihex, uint8_t b);
+void ihex_write_byte(struct ihex_state *ihex, unsigned int b);
 
 // Write `count` bytes from `data`
 void ihex_write_bytes(struct ihex_state *ihex, uint8_t *data, unsigned int count);
