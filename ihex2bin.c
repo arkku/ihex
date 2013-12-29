@@ -36,8 +36,8 @@ main (int argc, char *argv[]) {
 
     while (fgets(buf, sizeof(buf), stdin)) {
         count = strlen(buf);
-        line_number += (count && buf[count - 1] == '\n') ? 1 : 0;
         ihex_read_bytes(&ihex, buf, count);
+        line_number += (count && buf[count - 1] == '\n') ? 1 : 0;
     }
     ihex_end_read(&ihex);
 
