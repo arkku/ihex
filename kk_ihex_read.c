@@ -139,7 +139,7 @@ ihex_read_byte (struct ihex_state *ihex, int b) {
                     } 
                     ihex->flags = (ihex->flags & ~IHEX_READ_RECORD_TYPE_MASK) | b;
                     break;
-                case (READ_DATA_LOW >> 1): {
+                case (READ_DATA_LOW >> 1):
                     if (len < ihex->line_length) {
                         // data byte
                         ihex->length = len + 1;
@@ -150,7 +150,6 @@ ihex_read_byte (struct ihex_state *ihex, int b) {
                     ihex_end_read(ihex);
                 default:
                     return;
-                }
                 }
             }
             ++state;
