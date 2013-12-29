@@ -119,8 +119,7 @@ ihex_read_byte (struct ihex_state *ihex, int b) {
                     // data length
                     ihex->line_length = b;
                     if (b > IHEX_LINE_MAX_LENGTH) {
-                        ihex_end_read(ihex);
-                        return;
+                        goto end_read_and_return;
                     }
                     break;
                 case (READ_ADDRESS_MSB_LOW >> 1):
@@ -147,6 +146,7 @@ ihex_read_byte (struct ihex_state *ihex, int b) {
                         goto save_read_state;
                     }
                     // end of line (last "data" byte is checksum)
+                end_read_and_return:
                     ihex_end_read(ihex);
                 default:
                     return;
