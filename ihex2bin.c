@@ -20,7 +20,8 @@ static unsigned long file_position = 0L;
 int
 main (int argc, char *argv[]) {
     struct ihex_state ihex;
-    int c;
+    unsigned int count;
+    char buf[1024];
 
     if (argc == 2) {
         if (!(outfile = fopen(argv[1], "wb"))) {
@@ -32,9 +33,11 @@ main (int argc, char *argv[]) {
     }
     ihex_begin_read(&ihex);
 
-    while ((c = fgetc(stdin)) != EOF) {
-        ihex_read_byte(&ihex, c);
-        line_number += (c == '\n') ? 1 : 0;
+    while ((count = fread(buf, 1, sizeof(buf), stdin))) {
+        ihex_read_bytes(&ihex, buf, count);
+        do {
+            line_number += (buf[--count] == '\n') ? 1 : 0;
+        } while (count);
     }
     ihex_end_read(&ihex);
 
