@@ -12,6 +12,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 static FILE *outfile;
 static unsigned long line_number = 1;
@@ -21,7 +22,7 @@ int
 main (int argc, char *argv[]) {
     struct ihex_state ihex;
     unsigned int count;
-    char buf[1024];
+    char buf[256];
 
     if (argc == 2) {
         if (!(outfile = fopen(argv[1], "wb"))) {
@@ -33,11 +34,10 @@ main (int argc, char *argv[]) {
     }
     ihex_begin_read(&ihex);
 
-    while ((count = fread(buf, 1, sizeof(buf), stdin))) {
+    while (fgets(buf, sizeof(buf), stdin)) {
+        count = strlen(buf);
+        line_number += (count && buf[count - 1] == '\n') ? 1 : 0;
         ihex_read_bytes(&ihex, buf, count);
-        do {
-            line_number += (buf[--count] == '\n') ? 1 : 0;
-        } while (count);
     }
     ihex_end_read(&ihex);
 
