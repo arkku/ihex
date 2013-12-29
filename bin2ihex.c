@@ -15,7 +15,7 @@
 int
 main (void) {
     struct ihex_state ihex;
-    size_t count;
+    unsigned int count;
     uint8_t buf[1024];
 
     ihex_init(&ihex);

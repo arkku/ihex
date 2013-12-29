@@ -133,7 +133,7 @@ ihex_read_byte (struct ihex_state *ihex, int b) {
                     break;
                 case (READ_RECORD_TYPE_LOW >> 1):
                     // record type
-                    if (b > IHEX_READ_RECORD_TYPE_MASK) {
+                    if (b & ~IHEX_READ_RECORD_TYPE_MASK) {
                         // skip non-standard record types silently
                         return;
                     } 
