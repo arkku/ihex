@@ -135,11 +135,12 @@ enum ihex_record_type {
     IHEX_START_LINEAR_ADDRESS_RECORD
 };
 
+#ifndef IHEX_DISABLE_SEGMENTS
+
 // Resolve segmented address (if any). It is the author's recommendation that
 // segmented addressing not be used (and indeed the write function of this
 // library uses linear 32-bit addressing unless manually overridden).
 //
-#ifndef IHEX_DISABLE_SEGMENTS
 #define IHEX_LINEAR_ADDRESS(ihex) ((ihex)->address + (((ihex_address_t)((ihex)->segment)) << 4))
 //
 // Note that segmented addressing with this macro is not strictly adherent to 
@@ -158,6 +159,23 @@ enum ihex_record_type {
 #define IHEX_LINEAR_ADDRESS(ihex) ((ihex)->address)
 #define IHEX_BYTE_ADDRESS(ihex, byte_index) ((ihex)->address + (byte_index))
 
+#endif
+
+// The newline string (appended to every output line, e.g., "\r\n")
+#ifndef IHEX_NEWLINE_STRING
+#define IHEX_NEWLINE_STRING "\n"
+#endif
+
+// Define this as 1 to catch truncated lines when reading (they will report
+// a checksum error or at the very least insufficient length). The default
+// is to ignore truncated lines - this allows for somewhat smaller and faster
+// code, and the only potential risk is when there is an error in the
+// transmission that only cuts some lines short while not causing any
+// checksum errors in non-truncated lines. That scenario seems unlikely,
+// and in any case one should use a better checksum (e.g., SHA1/MD5) over
+// the whole data if integrity is critical.
+#ifndef IHEX_CATCH_TRUNCATED_LINES
+#define IHEX_CATCH_TRUNCATED_LINES 0
 #endif
 
 // See kk_ihex_read.h and kk_ihex_write.h for function declarations!

@@ -76,11 +76,6 @@
 #define IHEX_MAX_OUTPUT_LINE_LENGTH IHEX_LINE_MAX_LENGTH
 #endif
 
-// The newline string (appended to every output line)
-#ifndef IHEX_NEWLINE_STRING
-#define IHEX_NEWLINE_STRING "\n"
-#endif
-
 // Initialise the structure `ihex` for writing
 void ihex_init(struct ihex_state * const ihex);
 
