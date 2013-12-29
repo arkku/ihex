@@ -166,18 +166,6 @@ enum ihex_record_type {
 #define IHEX_NEWLINE_STRING "\n"
 #endif
 
-// Define this as 1 to catch truncated lines when reading (they will report
-// a checksum error or at the very least insufficient length). The default
-// is to ignore truncated lines - this allows for somewhat smaller and faster
-// code, and the only potential risk is when there is an error in the
-// transmission that only cuts some lines short while not causing any
-// checksum errors in non-truncated lines. That scenario seems unlikely,
-// and in any case one should use a better checksum (e.g., SHA1/MD5) over
-// the whole data if integrity is critical.
-#ifndef IHEX_CATCH_TRUNCATED_LINES
-#define IHEX_CATCH_TRUNCATED_LINES 0
-#endif
-
 // See kk_ihex_read.h and kk_ihex_write.h for function declarations!
 
 #endif // !KK_IHEX_H

@@ -92,74 +92,74 @@ ihex_end_read (struct ihex_state * const ihex) {
 
 void
 ihex_read_byte (struct ihex_state *ihex, int b) {
-    enum ihex_read_state state = (ihex->flags & IHEX_READ_STATE_MASK);
+    unsigned int len = ihex->length;
+    uint_fast8_t state = (ihex->flags & IHEX_READ_STATE_MASK);
     ihex->flags ^= state; // turn off the old state
     state >>= IHEX_READ_STATE_OFFSET;
-    if (b != IHEX_START) {
-        if (b >= '0' && b <= '9') {
-            b -= '0';
-        } else if (b >= 'A' && b <= 'F') {
-            b -= 'A' - 10;
-        } else if (b >= 'a' && b <= 'f') {
-            b -= 'a' - 10;
-        } else {
-            // ignore extra characters
-            goto save_read_state;
-        }
-        {
-            unsigned int len = ihex->length;
-            if (state & 1) {
-                // high nybble, store temporarily at end of data:
-                ihex->data[len] = b << 4;
-            } else {
-                // low nybble, combine with stored high nybble:
-                b = (ihex->data[len] |= b);
-                switch (state >> 1) {
-                case (READ_COUNT_LOW >> 1):
-                    // data length
-                    ihex->line_length = b;
-                    if (b > IHEX_LINE_MAX_LENGTH) {
-                        goto end_read_and_return;
-                    }
-                    break;
-                case (READ_ADDRESS_MSB_LOW >> 1):
-                    // high byte of 16-bit address
-                    ihex->address = (ihex->address & ADDRESS_HIGH_MASK);
-                    b <<= 8;
-                case (READ_ADDRESS_LSB_LOW >> 1):
-                    // low byte of 16-bit address
-                    ihex->address |= b;
-                    break;
-                case (READ_RECORD_TYPE_LOW >> 1):
-                    // record type
-                    if (b & ~IHEX_READ_RECORD_TYPE_MASK) {
-                        // skip non-standard record types silently
-                        return;
-                    } 
-                    ihex->flags = (ihex->flags & ~IHEX_READ_RECORD_TYPE_MASK) | b;
-                    break;
-                case (READ_DATA_LOW >> 1):
-                    if (len < ihex->line_length) {
-                        // data byte
-                        ihex->length = len + 1;
-                        --state; // back to READ_DATA_HIGH
-                        goto save_read_state;
-                    }
-                    // end of line (last "data" byte is checksum)
-                end_read_and_return:
-                    ihex_end_read(ihex);
-                default:
-                    return;
-                }
-            }
-            ++state;
-        }
-    } else {
-        // start of record
-#if IHEX_CATCH_TRUNCATED_LINES != 0
-        ihex_end_read(ihex);
-#endif
+
+    if (b >= '0' && b <= '9') {
+        b -= '0';
+    } else if (b >= 'A' && b <= 'F') {
+        b -= 'A' - 10;
+    } else if (b >= 'a' && b <= 'f') {
+        b -= 'a' - 10;
+    } else if (b == IHEX_START) {
+        // sync to a new record at any state
         state = READ_COUNT_HIGH;
+        goto end_read;
+    } else {
+        // ignore unknown characters (e.g., extra whitespace)
+        goto save_read_state;
+    }
+
+    if (!(++state & 1)) {
+        // high nybble, store temporarily at end of data:
+        ihex->data[len] = b << 4;
+    } else {
+        // low nybble, combine with stored high nybble:
+        b = (ihex->data[len] |= b);
+        switch (state >> 1) {
+        default:
+            // remain in initial state while waiting for :
+            return;
+        case (READ_COUNT_LOW >> 1):
+            // data length
+            ihex->line_length = b;
+#if IHEX_LINE_MAX_LENGTH < 255
+            if (b > IHEX_LINE_MAX_LENGTH) {
+                ihex_end_read(ihex);
+                return;
+            }
+#endif
+            break;
+        case (READ_ADDRESS_MSB_LOW >> 1):
+            // high byte of 16-bit address
+            ihex->address = (ihex->address & ADDRESS_HIGH_MASK);
+            b <<= 8;
+        case (READ_ADDRESS_LSB_LOW >> 1):
+            // low byte of 16-bit address
+            ihex->address |= b;
+            break;
+        case (READ_RECORD_TYPE_LOW >> 1):
+            // record type
+            if (b & ~IHEX_READ_RECORD_TYPE_MASK) {
+                // skip unknown record types silently
+                return;
+            } 
+            ihex->flags = (ihex->flags & ~IHEX_READ_RECORD_TYPE_MASK) | b;
+            break;
+        case (READ_DATA_LOW >> 1):
+            if (len < ihex->line_length) {
+                // data byte
+                ihex->length = len + 1;
+                state = READ_DATA_HIGH;
+                goto save_read_state;
+            }
+            // end of line (last "data" byte is checksum)
+            state = READ_WAIT_FOR_START;
+        end_read:
+            ihex_end_read(ihex);
+        }
     }
 save_read_state:
     ihex->flags |= state << IHEX_READ_STATE_OFFSET;
