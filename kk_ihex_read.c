@@ -138,8 +138,7 @@ ihex_read_byte (struct ihex_state *ihex, int b) {
         case READ_RECORD_TYPE_LOW:
             if (b > IHEX_READ_RECORD_TYPE_MASK) {
                 // ignore unknown record type
-                state = READ_WAIT_FOR_START;
-                goto save_read_state;
+                return; // state has been zeroed
             }
             ihex->flags |= (b & IHEX_READ_RECORD_TYPE_MASK);
             break;
@@ -157,8 +156,7 @@ ihex_read_byte (struct ihex_state *ihex, int b) {
             ihex_end_read(ihex);
         }
         default:
-            state = READ_WAIT_FOR_START;
-            goto save_read_state;
+            return; // state has been zeroed
         }
         ++state;
     } else if (b == IHEX_START) {
