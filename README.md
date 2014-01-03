@@ -76,20 +76,26 @@ Usage by example:
     # Simple conversion from binary to IHEX:
     bin2ihex <infile.bin >outfile.hex
 
-    # Add an offset to the output addresses:
-    bin2ihex -a 0x800000 -i infile.bin -o outfile.hex
+    # Add an offset to the output addresses (i.e., make the address
+    # of the first byte of the input other than zero):
+    bin2ihex -a 0x8000000 -i infile.bin -o outfile.hex
 
     # Simple conversion from IHEX to binary:
     ihex2bin <infile.hex >outfile.bin
 
-    # If the Intel HEX data begins at an address other than 0,
-    # start output at the first data byte rather than fill everything
-    # from 0 to that address with zero bytes:
-    #
-    ihex2bin -A -i infile.hex -o outfile.bin
-
     # Manually specify the initial address written (i.e., subtract
     # an offset from the input addresses):
-    ihex2bin -a 0x800000 -i infile.hex -o outfile.bin
+    ihex2bin -a 0x8000000 -i infile.hex -o outfile.bin
+
+    # Start output at the first data byte (i.e., make the address offset
+    # equal to the address of the first data byte read from input):
+    ihex2bin -A -i infile.hex -o outfile.bin
 
 Both programs also accept the option `-v` to enable some debug messages.
+
+When using `ihex2bin` on Intel HEX files produced by compilers and such,
+it is a good idea to specify the command-line option `-A` to autodetect
+the address offset. Otherwise the program will simply fill any unused
+addresses, starting from 0, with zero bytes, which may end up being
+mega- or even gigabytes.
+
