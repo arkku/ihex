@@ -64,3 +64,32 @@ implemented by the caller to store the binary data, e.g., as follows:
 
 For an example complete with error handling, see the included program
 `ihex2bin.c`.
+
+
+Example Programs
+================
+
+The included example programs, `ihex2bin` and `bin2ihex`, implement
+a very simple conversion between raw binary data and Intel HEX.
+Usage by example:
+
+    # Simple conversion from binary to IHEX:
+    bin2ihex <infile.bin >outfile.hex
+
+    # Add an offset to the output addresses:
+    bin2ihex -a 0x800000 -i infile.bin -o outfile.hex
+
+    # Simple conversion from IHEX to binary:
+    ihex2bin <infile.hex >outfile.bin
+
+    # If the Intel HEX data begins at an address other than 0,
+    # start output at the first data byte rather than fill everything
+    # from 0 to that address with zero bytes:
+    #
+    ihex2bin -A -i infile.hex -o outfile.bin
+
+    # Manually specify the initial address written (i.e., subtract
+    # an offset from the input addresses):
+    ihex2bin -a 0x800000 -i infile.hex -o outfile.bin
+
+Both programs also accept the option `-v` to enable some debug messages.

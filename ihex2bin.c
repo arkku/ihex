@@ -1,7 +1,20 @@
 /*
- * ihex2bin.c: Read Intel HEX data from stdin, write binary data to stdout
- * or a file specified on the command line. Specifying output file allows
- * sparse and/or unordered data to be written.
+ * ihex2bin.c: Read Intel HEX format, write binary data.
+ *
+ * By default reads from stdin and writes to stdout. The command-line
+ * options `-i` and `-o` can be used to specify the input and output
+ * file, respectively. Specifying an output file allows sparse writes.
+ *
+ * NOTE: Many Intel HEX files produced by compilers/etc have data
+ * beginning at an address greater than zero, potentially causing very
+ * unnecessarily large files to be created. The command-line option
+ * `-a` can be used to specify the start address of the output file,
+ * i.e., the value will be subtracted from the IHEX addresses (the
+ * result must not be negative).
+ *
+ * Alternatively, the command-line option `-A` sets the address offset
+ * to the first address that would be written (i.e., first byte of
+ * data written will be at address 0).
  *
  * Copyright (c) 2013 Kimmo Kulovesi, http://arkku.com
  * Provided with absolutely no warranty, use at your own risk only.
@@ -13,28 +26,84 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 static FILE *outfile;
-static unsigned long line_number = 1;
+static unsigned long line_number = 1L;
 static unsigned long file_position = 0L;
+static unsigned long address_offset = 0UL;
+static _Bool debug_enabled = 0;
 
 int
 main (int argc, char *argv[]) {
     struct ihex_state ihex;
+    FILE *infile = stdin;
     unsigned int count;
     char buf[256];
 
-    if (argc == 2) {
-        if (!(outfile = fopen(argv[1], "wb"))) {
-            perror(argv[1]);
-            return EXIT_FAILURE;
-        }
-    } else {
-        outfile = stdout;
-    }
-    ihex_begin_read(&ihex);
+    outfile = stdout;
 
-    while (fgets(buf, sizeof(buf), stdin)) {
+    // spaghetti parser of args: -o outfile -i infile -a initial_address
+    for (int i = 1; i < argc; ++i) {
+        char *arg = argv[i];
+        if (arg[0] == '-' && arg[1] && arg[2] == '\0') {
+            switch (arg[1]) {
+            case 'a':
+                if (++i == argc) {
+                    goto invalid_argument;
+                }
+                errno = 0;
+                address_offset = strtoul(argv[i], &arg, 0);
+                if (errno || arg == argv[i]) {
+                    errno = errno ? errno : EINVAL;
+                    goto argument_error;
+                }
+                break;
+            case 'A':
+                address_offset = ~0UL; // special value for autodetect
+                break;
+            case 'o':
+                if (++i == argc) {
+                    goto invalid_argument;
+                }
+                if (!(outfile = fopen(++arg, "w"))) {
+                    goto argument_error;
+                }
+                break;
+            case 'i':
+                if (++i == argc) {
+                    goto invalid_argument;
+                }
+                if (!(infile = fopen(++arg, "rb"))) {
+                    goto argument_error;
+                }
+                break;
+            case 'v':
+                debug_enabled = 1;
+                break;
+            case 'h':
+            case '?':
+                i = EXIT_SUCCESS;
+                goto usage;
+            default:
+                goto invalid_argument;
+            }
+            continue;
+        }
+invalid_argument:
+        (void) fprintf(stderr, "Invalid argument: %s\n", arg);
+usage:
+        (void) fprintf(stderr, "Usage: %s ([-a <address_offset>]|[-A])"
+                                " [-o <out.bin>] [-i <in.hex>] [-v]\n",
+                       argv[0]);
+        return i;
+argument_error:
+        perror(argv[i]);
+        return EXIT_FAILURE;
+    }
+
+    ihex_read_at_address(&ihex, (ihex_address_t) address_offset);
+    while (fgets(buf, sizeof(buf), infile)) {
         count = strlen(buf);
         ihex_read_bytes(&ihex, buf, count);
         line_number += (count && buf[count - 1] == '\n') ? 1 : 0;
@@ -61,17 +130,37 @@ ihex_data_read (struct ihex_state *ihex, enum ihex_record_type type,
     }
     if (type == IHEX_DATA_RECORD) {
         unsigned long address = (unsigned long) IHEX_LINEAR_ADDRESS(ihex);
-        if (address != file_position) {
-            (void) fprintf(stderr, "Seeking from %lu to %lu on line %lu\n",
-                           file_position, address, line_number);
-            if (file_position < address && outfile == stdout) {
-                // "seek" forward in stdout by writing NUL bytes
-                do {
-                    (void) fputc('\0', outfile);
-                } while (++file_position < address);
-            } else if (fseek(outfile, address, SEEK_SET)) {
-                perror("fseek");
+        if (address < address_offset) {
+            if (address_offset == ~0UL) {
+                // autodetect initial address
+                address_offset = address;
+                if (debug_enabled) {
+                    (void) fprintf(stderr, "Address offset: 0x%lx\n",
+                            address_offset);
+                }
+            } else {
+                (void) fprintf(stderr, "Address underflow on line %lu\n",
+                        line_number);
                 exit(EXIT_FAILURE);
+            }
+        }
+        address -= address_offset;
+        if (address != file_position) {
+            if (debug_enabled) {
+                (void) fprintf(stderr,
+                        "Seeking from 0x%lx to 0x%lx on line %lu\n",
+                        file_position, address, line_number);
+            }
+            if (outfile == stdout || fseek(outfile, address, SEEK_SET)) {
+                if (file_position < address) {
+                    // "seek" forward in stdout by writing NUL bytes
+                    do {
+                        (void) fputc('\0', outfile);
+                    } while (++file_position < address);
+                } else {
+                    perror("fseek");
+                    exit(EXIT_FAILURE);
+                }
             }
             file_position = address;
         }
@@ -81,8 +170,10 @@ ihex_data_read (struct ihex_state *ihex, enum ihex_record_type type,
         }
         file_position += ihex->length;
     } else if (type == IHEX_END_OF_FILE_RECORD) {
-        if (outfile != stdout) {
+        if (debug_enabled) {
             (void) fprintf(stderr, "%lu bytes written\n", file_position);
+        }
+        if (outfile != stdout) {
             (void) fclose(outfile);
         }
         outfile = NULL;
