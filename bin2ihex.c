@@ -54,7 +54,7 @@ main (int argc, char *argv[]) {
                 if (++i == argc) {
                     goto invalid_argument;
                 }
-                if (!(outfile = fopen(++arg, "w"))) {
+                if (!(outfile = fopen(argv[i], "w"))) {
                     goto argument_error;
                 }
                 break;
@@ -62,7 +62,7 @@ main (int argc, char *argv[]) {
                 if (++i == argc) {
                     goto invalid_argument;
                 }
-                if (!(infile = fopen(++arg, "rb"))) {
+                if (!(infile = fopen(argv[i], "rb"))) {
                     goto argument_error;
                 }
                 break;

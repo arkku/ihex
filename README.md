@@ -91,11 +91,11 @@ Usage by example:
     # equal to the address of the first data byte read from input):
     ihex2bin -A -i infile.hex -o outfile.bin
 
-Both programs also accept the option `-v` to enable some debug messages.
+Both programs also accept the option `-v` to increase verbosity.
 
 When using `ihex2bin` on Intel HEX files produced by compilers and such,
 it is a good idea to specify the command-line option `-A` to autodetect
 the address offset. Otherwise the program will simply fill any unused
-addresses, starting from 0, with zero bytes, which may end up being
-mega- or even gigabytes.
+addresses, starting from 0, with zero bytes, which may total mega- or
+even gigabytes.
 
