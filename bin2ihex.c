@@ -7,7 +7,7 @@
  * `-a` (also, `-a 0` forces output of the initial offset even
  * though it is the default zero).
  *
- * Copyright (c) 2013 Kimmo Kulovesi, http://arkku.com
+ * Copyright (c) 2013-2014 Kimmo Kulovesi, http://arkku.com
  * Provided with absolutely no warranty, use at your own risk only.
  * Distribute freely, mark modified copies as such.
  */
@@ -34,35 +34,38 @@ main (int argc, char *argv[]) {
     outfile = stdout;
 
     // spaghetti parser of args: -o outfile -i infile -a initial_address
-    for (int i = 1; i < argc; ++i) {
-        char *arg = argv[i];
+    while (--argc) {
+        char *arg = *(++argv);
         if (arg[0] == '-' && arg[1] && arg[2] == '\0') {
             switch (arg[1]) {
             case 'a':
-                if (++i == argc) {
+                if (--argc == 0) {
                     goto invalid_argument;
                 }
+                ++argv;
                 errno = 0;
-                initial_address = (ihex_address_t) strtoul(argv[i], &arg, 0);
-                if (errno || arg == argv[i]) {
+                initial_address = (ihex_address_t) strtoul(*argv, &arg, 0);
+                if (errno || arg == *argv) {
                     errno = errno ? errno : EINVAL;
                     goto argument_error;
                 }
                 write_initial_address = 1;
                 break;
-            case 'o':
-                if (++i == argc) {
+            case 'i':
+                if (--argc == 0) {
                     goto invalid_argument;
                 }
-                if (!(outfile = fopen(argv[i], "w"))) {
+                ++argv;
+                if (!(infile = fopen(*argv, "rb"))) {
                     goto argument_error;
                 }
                 break;
-            case 'i':
-                if (++i == argc) {
+            case 'o':
+                if (--argc == 0) {
                     goto invalid_argument;
                 }
-                if (!(infile = fopen(argv[i], "rb"))) {
+                ++argv;
+                if (!(outfile = fopen(*argv, "w"))) {
                     goto argument_error;
                 }
                 break;
@@ -71,7 +74,7 @@ main (int argc, char *argv[]) {
                 break;
             case 'h':
             case '?':
-                i = EXIT_SUCCESS;
+                arg = NULL;
                 goto usage;
             default:
                 goto invalid_argument;
@@ -81,12 +84,14 @@ main (int argc, char *argv[]) {
 invalid_argument:
         (void) fprintf(stderr, "Invalid argument: %s\n", arg);
 usage:
-        (void) fprintf(stderr, "Usage: %s [-a <address_offset>]"
-                               " [-o <out.hex>] [-i <in.bin>] [-v]\n",
-                       argv[0]);
-        return i;
+        if (!arg) {
+            (void) fprintf(stderr, "Copyright (c) 2013-2014 Kimmo Kulovesi\n");
+        }
+        (void) fprintf(stderr, "Usage: bin2ihex [-a <address_offset>]"
+                               " [-o <out.hex>] [-i <in.bin>] [-v]\n");
+        return arg ? EXIT_FAILURE : EXIT_SUCCESS;
 argument_error:
-        perror(argv[i]);
+        perror(*argv);
         return EXIT_FAILURE;
     }
 
