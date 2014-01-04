@@ -100,6 +100,8 @@
 #ifndef KK_IHEX_H
 #define KK_IHEX_H
 
+#define KK_IHEX_VERSION "2014-01-04"
+
 #include <stdint.h>
 
 typedef uint_least32_t ihex_address_t;

@@ -95,9 +95,8 @@ main (int argc, char *argv[]) {
 invalid_argument:
         (void) fprintf(stderr, "Invalid argument: %s\n", arg);
 usage:
-        if (!arg) {
-            (void) fprintf(stderr, "Copyright (c) 2013-2014 Kimmo Kulovesi\n");
-        }
+        (void) fprintf(stderr, "kk_ihex " KK_IHEX_VERSION
+                               " - Copyright (c) 2013-2014 Kimmo Kulovesi\n");
         (void) fprintf(stderr, "Usage: ihex2bin ([-a <address_offset>]|[-A])"
                                 " [-o <out.bin>] [-i <in.hex>] [-v]\n");
         return arg ? EXIT_FAILURE : EXIT_SUCCESS;

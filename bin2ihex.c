@@ -84,9 +84,8 @@ main (int argc, char *argv[]) {
 invalid_argument:
         (void) fprintf(stderr, "Invalid argument: %s\n", arg);
 usage:
-        if (!arg) {
-            (void) fprintf(stderr, "Copyright (c) 2013-2014 Kimmo Kulovesi\n");
-        }
+        (void) fprintf(stderr, "kk_ihex " KK_IHEX_VERSION
+                               " - Copyright (c) 2013-2014 Kimmo Kulovesi\n");
         (void) fprintf(stderr, "Usage: bin2ihex [-a <address_offset>]"
                                " [-o <out.hex>] [-i <in.bin>] [-v]\n");
         return arg ? EXIT_FAILURE : EXIT_SUCCESS;
@@ -111,7 +110,7 @@ argument_error:
 
     if (debug_enabled) {
         (void) fprintf(stderr, "%lu bytes read\n",
-                (unsigned long) ihex.address);
+                (unsigned long) ihex.address - initial_address);
     }
 
     return EXIT_SUCCESS;
