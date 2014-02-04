@@ -3,7 +3,7 @@
  *
  * See the header `kk_ihex.h` for instructions.
  *
- * Copyright (c) 2013 Kimmo Kulovesi, http://arkku.com/
+ * Copyright (c) 2013-2014 Kimmo Kulovesi, http://arkku.com/
  * Provided with absolutely no warranty, use at your own risk only.
  * Use and distribute freely, mark modified copies as such.
  */
@@ -82,7 +82,7 @@ ihex_end_read (struct ihex_state * const ihex) {
             ihex->address |= ((ihex_address_t) ihex->data[1]) << 16;
 #ifndef IHEX_DISABLE_SEGMENTS
         } else if (type == IHEX_EXTENDED_SEGMENT_ADDRESS_RECORD) {
-            ihex->segment = (ihex->data[0] << 8) | ihex->data[1];
+            ihex->segment = (ihex_segment_t) ((ihex->data[0] << 8) | ihex->data[1]);
 #endif
         }
     }
@@ -138,7 +138,7 @@ ihex_read_byte (struct ihex_state *ihex, int b) {
             b <<= 8;
         case (READ_ADDRESS_LSB_LOW >> 1):
             // low byte of 16-bit address
-            ihex->address |= b;
+            ihex->address |= (unsigned) b;
             break;
         case (READ_RECORD_TYPE_LOW >> 1):
             // record type

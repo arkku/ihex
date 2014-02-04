@@ -103,7 +103,7 @@ argument_error:
         }
         ihex.flags |= IHEX_FLAG_ADDRESS_OVERFLOW;
     }
-    while ((count = fread(buf, 1, sizeof(buf), infile))) {
+    while ((count = (unsigned int) fread(buf, 1, sizeof(buf), infile))) {
         ihex_write_bytes(&ihex, buf, count);
     }
     ihex_end_write(&ihex);

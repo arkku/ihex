@@ -107,7 +107,7 @@ argument_error:
 
     ihex_read_at_address(&ihex, (ihex_address_t) address_offset);
     while (fgets(buf, sizeof(buf), infile)) {
-        count = strlen(buf);
+        count = (unsigned int) strlen(buf);
         ihex_read_bytes(&ihex, buf, count);
         line_number += (count && buf[count - 1] == '\n') ? 1 : 0;
     }
@@ -154,7 +154,7 @@ ihex_data_read (struct ihex_state *ihex, enum ihex_record_type type,
                         "Seeking from 0x%lx to 0x%lx on line %lu\n",
                         file_position, address, line_number);
             }
-            if (outfile == stdout || fseek(outfile, address, SEEK_SET)) {
+            if (outfile == stdout || fseek(outfile, (long) address, SEEK_SET)) {
                 if (file_position < address) {
                     // "seek" forward in stdout by writing NUL bytes
                     do {

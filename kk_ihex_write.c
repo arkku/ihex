@@ -3,7 +3,7 @@
  *
  * See the header `kk_ihex.h` for instructions.
  *
- * Copyright (c) 2013 Kimmo Kulovesi, http://arkku.com/
+ * Copyright (c) 2013-2014 Kimmo Kulovesi, http://arkku.com/
  * Provided with absolutely no warranty, use at your own risk only.
  * Use and distribute freely, mark modified copies as such.
  */
@@ -80,7 +80,7 @@ ihex_write_end_of_file (struct ihex_state * const ihex) {
     w = ihex_buffer_byte(w, 0); // address msb
     w = ihex_buffer_byte(w, 0); // address lsb
     w = ihex_buffer_byte(w, IHEX_END_OF_FILE_RECORD); // record type
-    w = ihex_buffer_byte(w, ~IHEX_END_OF_FILE_RECORD + 1); // checksum
+    w = ihex_buffer_byte(w, ~((unsigned int)IHEX_END_OF_FILE_RECORD) + 1U); // checksum
 #endif
     w = ihex_buffer_newline(w);
     ihex_flush_buffer(ihex, line_buffer, w);
