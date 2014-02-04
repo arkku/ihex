@@ -1,0 +1,75 @@
+.Dd February 1, 2014
+.Dt bin2ihex 1
+.Os kk_ihex
+.Sh NAME
+.Nm bin2ihex
+.Nd Convert binary data to Intel HEX
+.Sh SYNOPSIS
+.Nm
+.Op Fl a Ar address_offset
+.Op Fl i Ar input_file.bin
+.Op Fl o Ar output_file.hex
+.Op Fl v
+.Sh DESCRIPTION
+.Nm
+reads binary data from standard input and writes the Intel HEX encoded
+data to standard output.
+.Sh OPTIONS
+.Bl -tag -width -indent
+.It Fl a Ar address_offset
+Set the address of the first input byte to
+.Ar address_offset
+(default 0)
+.It Fl i Ar file
+Read the binary input from
+.Ar file
+instead of standard input
+.It Fl o Ar file
+Write the Intel HEX output to
+.Ar file
+instead of standard output
+.It Fl v
+Print extra status messages to standard error
+.El
+.Sh EXAMPLES
+Read binary data from
+.Ar input.bin
+and write the Intel HEX output to
+.Ar output.hex
+.Pp
+.Bd -ragged -offset indent
+.Nm
+.Fl i
+.Ar input.bin
+.Fl o
+.Ar output.hex
+.Ed
+.Pp
+Read binary data from
+.Ar input.bin
+and write the Intel HEX output to
+.Ar output.hex
+such that the first byte of the input will have the address
+.Ar 0x8000000
+in the output (e.g., for creating an image with the correct addresses for flashing
+to a ROM):
+.Bd -ragged -offset indent
+.Nm
+.Fl a
+.Ar 0x8000000
+.Fl i
+.Ar input.bin
+.Fl o
+.Ar output.hex
+.Ed
+.Pp
+Note that the address offset does not make the resulting output significantly
+larger, but conversion back to binary with
+.Xr ihex2bin 1
+must be done with the same
+.Fl a
+argument to obtain a binary file identical to the original.
+.Sh SEE ALSO
+.Xr ihex2bin 1
+.Sh AUTHOR
+.An "Kimmo Kulovesi" Aq http://arkku.com
