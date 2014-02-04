@@ -28,6 +28,8 @@
 #include <string.h>
 #include <errno.h>
 
+#define AUTODETECT_ADDRESS (~0UL)
+
 static FILE *outfile;
 static unsigned long line_number = 1L;
 static unsigned long file_position = 0L;
@@ -60,7 +62,7 @@ main (int argc, char *argv[]) {
                 }
                 break;
             case 'A':
-                address_offset = ~0UL; // special value to autodetect
+                address_offset = AUTODETECT_ADDRESS;
                 break;
             case 'i':
                 if (--argc == 0) {
@@ -105,7 +107,9 @@ argument_error:
         return EXIT_FAILURE;
     }
 
-    ihex_read_at_address(&ihex, (ihex_address_t) address_offset);
+    ihex_read_at_address(&ihex, (address_offset != AUTODETECT_ADDRESS) ?
+                                (ihex_address_t) address_offset :
+                                0);
     while (fgets(buf, sizeof(buf), infile)) {
         count = (unsigned int) strlen(buf);
         ihex_read_bytes(&ihex, buf, count);
@@ -134,7 +138,7 @@ ihex_data_read (struct ihex_state *ihex, enum ihex_record_type type,
     if (type == IHEX_DATA_RECORD) {
         unsigned long address = (unsigned long) IHEX_LINEAR_ADDRESS(ihex);
         if (address < address_offset) {
-            if (address_offset == ~0UL) {
+            if (address_offset == AUTODETECT_ADDRESS) {
                 // autodetect initial address
                 address_offset = address;
                 if (debug_enabled) {
