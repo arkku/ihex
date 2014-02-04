@@ -7,16 +7,28 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4E06FF8718A15EED00C6B357 /* libkk_ihex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E2D127418A15D9D00E65B41 /* libkk_ihex.a */; };
+		4E06FF8818A15EF100C6B357 /* libkk_ihex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E2D127418A15D9D00E65B41 /* libkk_ihex.a */; };
+		4E2D127818A15DA700E65B41 /* kk_ihex_read.c in Sources */ = {isa = PBXBuildFile; fileRef = 4EA4812A18A1327F00BA2CE1 /* kk_ihex_read.c */; };
+		4E2D127918A15DAC00E65B41 /* kk_ihex_write.c in Sources */ = {isa = PBXBuildFile; fileRef = 4EA4812C18A1327F00BA2CE1 /* kk_ihex_write.c */; };
+		4E2D127A18A15DF100E65B41 /* kk_ihex.h in Headers */ = {isa = PBXBuildFile; fileRef = 4EA4812E18A1327F00BA2CE1 /* kk_ihex.h */; };
+		4E2D127B18A15DF100E65B41 /* kk_ihex_read.h in Headers */ = {isa = PBXBuildFile; fileRef = 4EA4812B18A1327F00BA2CE1 /* kk_ihex_read.h */; };
+		4E2D127C18A15DF100E65B41 /* kk_ihex_write.h in Headers */ = {isa = PBXBuildFile; fileRef = 4EA4812D18A1327F00BA2CE1 /* kk_ihex_write.h */; };
 		4EA4813C18A132A800BA2CE1 /* bin2ihex.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4EA4813B18A132A800BA2CE1 /* bin2ihex.1 */; };
 		4EA4814018A132B700BA2CE1 /* bin2ihex.c in Sources */ = {isa = PBXBuildFile; fileRef = 4EA4812818A1327F00BA2CE1 /* bin2ihex.c */; };
-		4EA4814118A132C200BA2CE1 /* kk_ihex_write.c in Sources */ = {isa = PBXBuildFile; fileRef = 4EA4812C18A1327F00BA2CE1 /* kk_ihex_write.c */; };
 		4EA4814B18A132D400BA2CE1 /* ihex2bin.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4EA4814A18A132D400BA2CE1 /* ihex2bin.1 */; };
 		4EA4814F18A132E100BA2CE1 /* ihex2bin.c in Sources */ = {isa = PBXBuildFile; fileRef = 4EA4812918A1327F00BA2CE1 /* ihex2bin.c */; };
-		4EA4815018A132E500BA2CE1 /* kk_ihex_read.c in Sources */ = {isa = PBXBuildFile; fileRef = 4EA4812A18A1327F00BA2CE1 /* kk_ihex_read.c */; };
 		4ED0BF2518A15A9A00E81BB4 /* ihex_test in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4E1AAC2518A156AF000ED383 /* ihex_test */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		4E06FF8518A15EEA00C6B357 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4EA4811418A131FF00BA2CE1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4E2D127318A15D9D00E65B41;
+			remoteInfo = kk_ihex;
+		};
 		4ED0BF2118A15A8300E81BB4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 4EA4811418A131FF00BA2CE1 /* Project object */;
@@ -68,6 +80,7 @@
 
 /* Begin PBXFileReference section */
 		4E1AAC2518A156AF000ED383 /* ihex_test */ = {isa = PBXFileReference; explicitFileType = text.script; path = ihex_test; sourceTree = SOURCE_ROOT; };
+		4E2D127418A15D9D00E65B41 /* libkk_ihex.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libkk_ihex.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4EA4812818A1327F00BA2CE1 /* bin2ihex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bin2ihex.c; sourceTree = SOURCE_ROOT; };
 		4EA4812918A1327F00BA2CE1 /* ihex2bin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ihex2bin.c; sourceTree = SOURCE_ROOT; };
 		4EA4812A18A1327F00BA2CE1 /* kk_ihex_read.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kk_ihex_read.c; sourceTree = SOURCE_ROOT; };
@@ -83,10 +96,18 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		4E2D127118A15D9D00E65B41 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4EA4813418A132A800BA2CE1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4E06FF8718A15EED00C6B357 /* libkk_ihex.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -94,6 +115,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4E06FF8818A15EF100C6B357 /* libkk_ihex.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -123,13 +145,44 @@
 				4EA4813718A132A800BA2CE1 /* bin2ihex */,
 				4EA4814618A132D400BA2CE1 /* ihex2bin */,
 				4ED0BF1C18A159FF00E81BB4 /* ihex_test */,
+				4E2D127418A15D9D00E65B41 /* libkk_ihex.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		4E2D127218A15D9D00E65B41 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4E2D127A18A15DF100E65B41 /* kk_ihex.h in Headers */,
+				4E2D127B18A15DF100E65B41 /* kk_ihex_read.h in Headers */,
+				4E2D127C18A15DF100E65B41 /* kk_ihex_write.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
+		4E2D127318A15D9D00E65B41 /* kk_ihex */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4E2D127518A15D9D00E65B41 /* Build configuration list for PBXNativeTarget "kk_ihex" */;
+			buildPhases = (
+				4E2D127018A15D9D00E65B41 /* Sources */,
+				4E2D127118A15D9D00E65B41 /* Frameworks */,
+				4E2D127218A15D9D00E65B41 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = kk_ihex;
+			productName = kk_ihex;
+			productReference = 4E2D127418A15D9D00E65B41 /* libkk_ihex.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		4EA4813618A132A800BA2CE1 /* bin2ihex */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4EA4813D18A132A800BA2CE1 /* Build configuration list for PBXNativeTarget "bin2ihex" */;
@@ -141,6 +194,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				4E06FF8618A15EEA00C6B357 /* PBXTargetDependency */,
 			);
 			name = bin2ihex;
 			productName = bin2ihex;
@@ -205,17 +259,26 @@
 				4EA4813618A132A800BA2CE1 /* bin2ihex */,
 				4EA4814518A132D400BA2CE1 /* ihex2bin */,
 				4ED0BF1B18A159FF00E81BB4 /* ihex_test */,
+				4E2D127318A15D9D00E65B41 /* kk_ihex */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		4E2D127018A15D9D00E65B41 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4E2D127818A15DA700E65B41 /* kk_ihex_read.c in Sources */,
+				4E2D127918A15DAC00E65B41 /* kk_ihex_write.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4EA4813318A132A800BA2CE1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				4EA4814018A132B700BA2CE1 /* bin2ihex.c in Sources */,
-				4EA4814118A132C200BA2CE1 /* kk_ihex_write.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -224,13 +287,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				4EA4814F18A132E100BA2CE1 /* ihex2bin.c in Sources */,
-				4EA4815018A132E500BA2CE1 /* kk_ihex_read.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		4E06FF8618A15EEA00C6B357 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4E2D127318A15D9D00E65B41 /* kk_ihex */;
+			targetProxy = 4E06FF8518A15EEA00C6B357 /* PBXContainerItemProxy */;
+		};
 		4ED0BF2218A15A8300E81BB4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 4EA4813618A132A800BA2CE1 /* bin2ihex */;
@@ -244,6 +311,34 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		4E2D127618A15D9D00E65B41 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				DEAD_CODE_STRIPPING = NO;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		4E2D127718A15D9D00E65B41 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				DEAD_CODE_STRIPPING = NO;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				MACOSX_DEPLOYMENT_TARGET = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		4EA4812318A131FF00BA2CE1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -287,7 +382,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LLVM_LTO = YES;
 				LLVM_VECTORIZE_LOOPS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
@@ -332,7 +427,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LLVM_LTO = YES;
 				LLVM_VECTORIZE_LOOPS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
 			};
@@ -345,6 +440,7 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
+				MACOSX_DEPLOYMENT_TARGET = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -352,6 +448,7 @@
 		4EA4813F18A132A800BA2CE1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -363,6 +460,7 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
+				MACOSX_DEPLOYMENT_TARGET = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -370,6 +468,7 @@
 		4EA4814E18A132D400BA2CE1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -383,7 +482,7 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -393,7 +492,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -401,6 +500,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		4E2D127518A15D9D00E65B41 /* Build configuration list for PBXNativeTarget "kk_ihex" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4E2D127618A15D9D00E65B41 /* Debug */,
+				4E2D127718A15D9D00E65B41 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		4EA4811718A131FF00BA2CE1 /* Build configuration list for PBXProject "kk_ihex" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -435,6 +543,7 @@
 				4ED0BF2018A159FF00E81BB4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
