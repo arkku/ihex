@@ -76,6 +76,10 @@
 #define IHEX_MAX_OUTPUT_LINE_LENGTH IHEX_LINE_MAX_LENGTH
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Initialise the structure `ihex` for writing
 void ihex_init(struct ihex_state * const ihex);
 
@@ -131,5 +135,9 @@ void ihex_write_at_segment(struct ihex_state *ihex, ihex_segment_t segment,
 // after `ihex_write_at_address` or `ihex_write_at_segment`. The maximum
 // is IHEX_LINE_MAX_LENGTH (which may be changed at compile time).
 void ihex_set_output_line_length(struct ihex_state *ihex, uint8_t line_length);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // !KK_IHEX_H
