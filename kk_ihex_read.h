@@ -41,6 +41,10 @@
 
 #include "kk_ihex.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Begin reading at address 0
 void ihex_begin_read(struct ihex_state *ihex);
 
@@ -98,6 +102,10 @@ extern _Bool ihex_data_read(struct ihex_state *ihex,
 //
 #ifndef IHEX_DISABLE_SEGMENTS
 void ihex_read_at_segment(struct ihex_state *ihex, ihex_segment_t segment);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // !KK_IHEX_READ_H
