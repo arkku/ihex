@@ -26,8 +26,8 @@ main (int argc, char *argv[]) {
     struct ihex_state ihex;
     FILE *infile = stdin;
     ihex_address_t initial_address = 0;
-    _Bool write_initial_address = 0;
-    _Bool debug_enabled = 0;
+    bool write_initial_address = 0;
+    bool debug_enabled = 0;
     unsigned int count;
     uint8_t buf[1024];
 

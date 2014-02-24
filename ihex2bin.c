@@ -34,7 +34,7 @@ static FILE *outfile;
 static unsigned long line_number = 1L;
 static unsigned long file_position = 0L;
 static unsigned long address_offset = 0UL;
-static _Bool debug_enabled = 0;
+static bool debug_enabled = 0;
 
 int
 main (int argc, char *argv[]) {

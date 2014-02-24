@@ -100,7 +100,7 @@
 #ifndef KK_IHEX_H
 #define KK_IHEX_H
 
-#define KK_IHEX_VERSION "2014-01-04"
+#define KK_IHEX_VERSION "2014-02-24"
 
 #include <stdint.h>
 #include <stdbool.h>
