@@ -80,6 +80,12 @@
  * maximum as greater than the line length you'll actually be writing,
  * e.g., 32 or 16.
  *
+ * If the write functionality is only occasionally used, you can provide
+ * your own buffer for the duration by defining `IHEX_EXTERNAL_WRITE_BUFFER`
+ * and providing a `char *ihex_write_buffer` which points to valid storage
+ * for at least `IHEX_WRITE_BUFFER_LENGTH` characters from before the first
+ * call to any IHEX write function to until after the last.
+ *
  * If you are doing both reading and writing, you can define the maximum
  * output length separately as `IHEX_MAX_OUTPUT_LINE_LENGTH` - this will
  * decrease the write buffer size, but `struct ihex_state` will still
@@ -100,7 +106,7 @@
 #ifndef KK_IHEX_H
 #define KK_IHEX_H
 
-#define KK_IHEX_VERSION "2014-02-24"
+#define KK_IHEX_VERSION "2014-02-25"
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -128,6 +134,7 @@ typedef struct ihex_state {
 } kk_ihex_t;
 
 #define IHEX_FLAG_ADDRESS_OVERFLOW  0x80    // 16-bit address overflow
+// (Other flags are reserved for internal use!)
 
 enum ihex_record_type {
     IHEX_DATA_RECORD,
@@ -153,7 +160,7 @@ enum ihex_record_type {
 // afterwards.
 //
 // To implement fully correct segmented addressing, compute the address
-// of _each byte_ with its index as follows:
+// of _each byte_ with its index in `data` as follows:
 //
 #define IHEX_BYTE_ADDRESS(ihex, byte_index) ((((ihex)->address + (byte_index)) & 0xFFFFU) + (((ihex_address_t)((ihex)->segment)) << 4))
 

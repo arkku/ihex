@@ -48,6 +48,16 @@
  * both the `struct ihex_state' and the internal write buffer smaller.
  * For example, 32 or even 16 can be used instead of the default 255.
  *
+ * If the write functionality is not used all the time and can thus
+ * share its write buffer memory with something else that is inactive
+ * during writing IHEX, you can define `IHEX_EXTERNAL_WRITE_BUFFER` and
+ * provide the buffer as `char *ihex_write_buffer`. The size of the
+ * buffer must be at least `IHEX_WRITE_BUFFER_LENGTH` bytes and it must
+ * be valid for the entire duration from the first call to a write function
+ * until after the last call to `ihex_end_write`. Note that there is
+ * no advantage to this unless something else, mutually exclusive with
+ * IHEX writing, can share the memory.
+ *
  * If you are reading IHEX as well, then you'll end up limiting the
  * maximum length of line that can be read. In that case you may wish to
  * define `IHEX_MAX_OUTPUT_LINE_LENGTH` as smaller to decrease the
@@ -77,6 +87,17 @@ extern "C" {
 
 #ifndef IHEX_MAX_OUTPUT_LINE_LENGTH
 #define IHEX_MAX_OUTPUT_LINE_LENGTH IHEX_LINE_MAX_LENGTH
+#endif
+
+// Length of the write buffer required
+#define IHEX_WRITE_BUFFER_LENGTH (1+2+4+2+(IHEX_MAX_OUTPUT_LINE_LENGTH*2)+2+sizeof(IHEX_NEWLINE_STRING))
+
+#ifdef IHEX_EXTERNAL_WRITE_BUFFER
+// Define `IHEX_EXTERNAL_WRITE_BUFFER` to provide an external write buffer,
+// as `char *ihex_write_buffer`, which must point to a valid storage for
+// at least `IHEX_WRITE_BUFFER_LENGTH` characters whenever any of the
+// write functionality is used (see above under "CONSERVING MEMORY").
+extern char *ihex_write_buffer;
 #endif
 
 // Initialise the structure `ihex` for writing
