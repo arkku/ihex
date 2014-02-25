@@ -5,31 +5,46 @@ AR=ar
 ARFLAGS=rcs
 
 OBJS = kk_ihex_write.o kk_ihex_read.o bin2ihex.o ihex2bin.o
-BINS = bin2ihex ihex2bin libkk_ihex.a
+BINPATH = ./
+LIBPATH = ./
+BINS = $(BINPATH)bin2ihex $(BINPATH)ihex2bin
+LIB = $(LIBPATH)libkk_ihex.a
+TESTFILE = $(LIB)
+TESTER = 
+#TESTER = valgrind
 
 .PHONY: all clean distclean test
 
-all: $(BINS)
+all: $(BINS) $(LIB)
 
 $(OBJS): kk_ihex.h
+$(BINS): | $(BINPATH)
+$(LIB): | $(LIBPATH)
 bin2ihex.o kk_ihex_write.o: kk_ihex_write.h
 ihex2bin.o kk_ihex_read.o: kk_ihex_read.h
 
-libkk_ihex.a: kk_ihex_write.o kk_ihex_read.o
+$(LIB): kk_ihex_write.o kk_ihex_read.o
 	$(AR) $(ARFLAGS) $@ $+
 
-bin2ihex: bin2ihex.o kk_ihex_write.o
+$(BINPATH)bin2ihex: bin2ihex.o $(LIB)
 	$(CC) $(LDFLAGS) -o $@ $+
 
-ihex2bin: ihex2bin.o kk_ihex_read.o
+$(BINPATH)ihex2bin: ihex2bin.o $(LIB)
 	$(CC) $(LDFLAGS) -o $@ $+
+
+$(sort $(BINPATH) $(LIBPATH)):
+	@mkdir -p $@
 
 test: bin2ihex ihex2bin
-	./ihex_test $<
+	@$(TESTER) $(BINPATH)bin2ihex -v -a 0x80 -i '$(TESTFILE)' | \
+	    $(TESTER) $(BINPATH)ihex2bin -A -v | \
+	    diff '$(TESTFILE)' -
+	@echo Loopback test success!
 
 clean:
 	rm -f $(OBJS)
 
 distclean: | clean
-	rm -f $(BINS)
+	rm -f $(BINS) $(LIB)
+	@rmdir $(BINPATH) $(LIBPATH) >/dev/null 2>/dev/null || true
 
