@@ -119,6 +119,13 @@ argument_error:
         ihex_end_write(&ihex);
     }
 
+    if (outfile != stdout) {
+        (void) fclose(outfile);
+    }
+    if (infile != stdout) {
+        (void) fclose(infile);
+    }
+
     if (debug_enabled) {
         (void) fprintf(stderr, "%lu bytes read\n",
                 (unsigned long) ihex.address - initial_address);

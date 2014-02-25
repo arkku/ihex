@@ -117,6 +117,10 @@ argument_error:
     }
     ihex_end_read(&ihex);
 
+    if (infile != stdin) {
+        (void) fclose(infile);
+    }
+
     return EXIT_SUCCESS;
 }
 
