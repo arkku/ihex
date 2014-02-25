@@ -55,13 +55,16 @@
  * reading any IHEX file.
  *
  *
- * Copyright (c) 2013 Kimmo Kulovesi, http://arkku.com/
+ * Copyright (c) 2013-2014 Kimmo Kulovesi, http://arkku.com/
  * Provided with absolutely no warranty, use at your own risk only.
  * Use and distribute freely, mark modified copies as such.
  */
 
 #ifndef KK_IHEX_WRITE_H
 #define KK_IHEX_WRITE_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "kk_ihex.h"
 
@@ -74,10 +77,6 @@
 
 #ifndef IHEX_MAX_OUTPUT_LINE_LENGTH
 #define IHEX_MAX_OUTPUT_LINE_LENGTH IHEX_LINE_MAX_LENGTH
-#endif
-
-#ifdef __cplusplus
-extern "C" {
 #endif
 
 // Initialise the structure `ihex` for writing
@@ -95,7 +94,8 @@ void ihex_write_at_address(struct ihex_state *ihex, ihex_address_t address);
 void ihex_write_byte(struct ihex_state *ihex, unsigned int b);
 
 // Write `count` bytes from `data`
-void ihex_write_bytes(struct ihex_state *ihex, uint8_t *data, unsigned int count);
+void ihex_write_bytes(struct ihex_state *ihex, uint8_t * restrict data,
+                      unsigned int count);
 
 // End writing (flush buffers, write end of file record)
 void ihex_end_write(struct ihex_state *ihex);
@@ -139,5 +139,4 @@ void ihex_set_output_line_length(struct ihex_state *ihex, uint8_t line_length);
 #ifdef __cplusplus
 }
 #endif
-
 #endif // !KK_IHEX_H

@@ -31,19 +31,18 @@
  * data bytes per line.
  *
  *
- * Copyright (c) 2013 Kimmo Kulovesi, http://arkku.com/
+ * Copyright (c) 2013-2014 Kimmo Kulovesi, http://arkku.com/
  * Provided with absolutely no warranty, use at your own risk only.
  * Use and distribute freely, mark modified copies as such.
  */
 
 #ifndef KK_IHEX_READ_H
 #define KK_IHEX_READ_H
-
-#include "kk_ihex.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "kk_ihex.h"
 
 // Begin reading at address 0
 void ihex_begin_read(struct ihex_state *ihex);
@@ -57,7 +56,8 @@ void ihex_read_at_address(struct ihex_state *ihex, ihex_address_t address);
 void ihex_read_byte(struct ihex_state *ihex, int c);
 
 // Read `count` bytes from `data`
-void ihex_read_bytes(struct ihex_state *ihex, char *data, unsigned int count);
+void ihex_read_bytes(struct ihex_state * restrict ihex, char * restrict data,
+                     unsigned int count);
 
 // End reading (may call `ihex_data_read` if there is data waiting)
 void ihex_end_read(struct ihex_state *ihex);
@@ -107,5 +107,4 @@ void ihex_read_at_segment(struct ihex_state *ihex, ihex_segment_t segment);
 #ifdef __cplusplus
 }
 #endif
-
 #endif // !KK_IHEX_READ_H

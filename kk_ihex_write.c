@@ -37,7 +37,7 @@ ihex_init (struct ihex_state * const ihex) {
 }
 
 static char *
-ihex_buffer_byte (char *w, const unsigned int byte) {
+ihex_buffer_byte (char * restrict w, const unsigned int byte) {
     unsigned int n = (byte & 0xF0U) >> 4; // high nybble
     *w++ = HEX_DIGIT(n);
     n = byte & 0x0FU; // low nybble
@@ -46,7 +46,8 @@ ihex_buffer_byte (char *w, const unsigned int byte) {
 }
 
 static char *
-ihex_buffer_word (char *w, const unsigned int word, unsigned int * const checksum) {
+ihex_buffer_word (char * restrict w, const unsigned int word,
+                  unsigned int * const restrict checksum) {
     unsigned int byte = (word & 0xFF00U) >> 8; // high byte
     w = ihex_buffer_byte(w, byte);
     *checksum += byte;
@@ -56,8 +57,8 @@ ihex_buffer_word (char *w, const unsigned int word, unsigned int * const checksu
 }
 
 static char *
-ihex_buffer_newline (char *w) {
-    const char *r = IHEX_NEWLINE;
+ihex_buffer_newline (char * restrict w) {
+    const char * restrict r = IHEX_NEWLINE;
     do {
         *w++ = *r++;
     } while (*r);
@@ -110,7 +111,6 @@ static void
 ihex_write_data (struct ihex_state * const ihex) {
     unsigned int len = ihex->length;
     unsigned int sum = len;
-    uint8_t *r = ihex->data;
     char *w = line_buffer;
 
     if (!len) {
@@ -146,11 +146,14 @@ ihex_write_data (struct ihex_state * const ihex) {
     //sum += IHEX_DATA_RECORD; // IHEX_DATA_RECORD is zero, so NOP
 
     // data
-    do {
-        unsigned int byte = *r++;
-        sum += byte;
-        w = ihex_buffer_byte(w, byte);
-    } while (--len);
+    {
+        uint8_t * restrict r = ihex->data;
+        do {
+            unsigned int byte = *r++;
+            sum += byte;
+            w = ihex_buffer_byte(w, byte);
+        } while (--len);
+    }
 
     // checksum
     w = ihex_buffer_byte(w, ~sum + 1U);
@@ -211,8 +214,8 @@ ihex_end_write (struct ihex_state *ihex) {
 }
 
 void
-ihex_write_bytes (struct ihex_state *ihex, uint8_t *data, unsigned int count) {
-    uint8_t *r = data;
+ihex_write_bytes (struct ihex_state *ihex, uint8_t * restrict r,
+                  unsigned int count) {
     while (count) {
         if (ihex->line_length > ihex->length) {
             unsigned int i = ihex->line_length - ihex->length;

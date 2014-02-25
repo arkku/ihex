@@ -166,7 +166,8 @@ save_read_state:
 }
 
 void
-ihex_read_bytes (struct ihex_state *ihex, char *data, unsigned int count) {
+ihex_read_bytes (struct ihex_state * restrict ihex, char * restrict data,
+                 unsigned int count) {
     while (count--) {
         ihex_read_byte(ihex, *data++);
     }
