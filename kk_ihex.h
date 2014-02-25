@@ -92,7 +92,7 @@
  * this is a fairly pointless optimisation.
  *
  *
- * Copyright (c) 2013 Kimmo Kulovesi, http://arkku.com/
+ * Copyright (c) 2013-2014 Kimmo Kulovesi, http://arkku.com/
  * Provided with absolutely no warranty, use at your own risk only.
  * Use and distribute freely, mark modified copies as such.
  */
@@ -146,14 +146,14 @@ enum ihex_record_type {
 //
 #define IHEX_LINEAR_ADDRESS(ihex) ((ihex)->address + (((ihex_address_t)((ihex)->segment)) << 4))
 //
-// Note that segmented addressing with this macro is not strictly adherent to 
-// the IHEX specification, which mandates that the/ lowest 16 bits of the
+// Note that segmented addressing with the above macro is not strictly adherent
+// to the IHEX specification, which mandates that the lowest 16 bits of the
 // address and the index of the data byte must be added modulo 64K (i.e.,
 // at 16 bits precision with wraparound) and the segment address only added
 // afterwards.
 //
-// To implement fully "correct" segmented addressing, compute the address
-// of each byte with its index as follows:
+// To implement fully correct segmented addressing, compute the address
+// of _each byte_ with its index as follows:
 //
 #define IHEX_BYTE_ADDRESS(ihex, byte_index) ((((ihex)->address + (byte_index)) & 0xFFFFU) + (((ihex_address_t)((ihex)->segment)) << 4))
 
