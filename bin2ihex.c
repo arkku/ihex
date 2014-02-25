@@ -17,6 +17,10 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#ifdef IHEX_EXTERNAL_WRITE_BUFFER
+char *ihex_write_buffer = NULL;
+#endif
+
 //#define IHEX_WRITE_INITIAL_EXTENDED_ADDRESS_RECORD
 
 static FILE *outfile;
@@ -94,19 +98,26 @@ argument_error:
         return EXIT_FAILURE;
     }
 
-    ihex_init(&ihex);
-    ihex_write_at_address(&ihex, initial_address);
-    if (write_initial_address) {
-        if (debug_enabled) {
-            (void) fprintf(stderr, "Address offset: 0x%lx\n",
-                    (unsigned long) ihex.address);
+    {
+#ifdef IHEX_EXTERNAL_WRITE_BUFFER
+        // How to provide an external write buffer with limited duration:
+        char buffer[IHEX_WRITE_BUFFER_LENGTH];
+        ihex_write_buffer = buffer;
+#endif
+        ihex_init(&ihex);
+        ihex_write_at_address(&ihex, initial_address);
+        if (write_initial_address) {
+            if (debug_enabled) {
+                (void) fprintf(stderr, "Address offset: 0x%lx\n",
+                        (unsigned long) ihex.address);
+            }
+            ihex.flags |= IHEX_FLAG_ADDRESS_OVERFLOW;
         }
-        ihex.flags |= IHEX_FLAG_ADDRESS_OVERFLOW;
+        while ((count = (unsigned int) fread(buf, 1, sizeof(buf), infile))) {
+            ihex_write_bytes(&ihex, buf, count);
+        }
+        ihex_end_write(&ihex);
     }
-    while ((count = (unsigned int) fread(buf, 1, sizeof(buf), infile))) {
-        ihex_write_bytes(&ihex, buf, count);
-    }
-    ihex_end_write(&ihex);
 
     if (debug_enabled) {
         (void) fprintf(stderr, "%lu bytes read\n",
