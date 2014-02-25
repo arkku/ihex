@@ -4,3 +4,4 @@ bin2ihex
 ihex2bin
 xcuserdata
 *.xcodeproj/*.xcworkspace
+build/
