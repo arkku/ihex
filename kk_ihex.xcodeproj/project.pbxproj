@@ -18,7 +18,6 @@
 		4EA4814018A132B700BA2CE1 /* bin2ihex.c in Sources */ = {isa = PBXBuildFile; fileRef = 4EA4812818A1327F00BA2CE1 /* bin2ihex.c */; };
 		4EA4814B18A132D400BA2CE1 /* ihex2bin.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4EA4814A18A132D400BA2CE1 /* ihex2bin.1 */; };
 		4EA4814F18A132E100BA2CE1 /* ihex2bin.c in Sources */ = {isa = PBXBuildFile; fileRef = 4EA4812918A1327F00BA2CE1 /* ihex2bin.c */; };
-		4ED0BF2518A15A9A00E81BB4 /* ihex_test in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4E1AAC2518A156AF000ED383 /* ihex_test */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -28,20 +27,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 4E2D127318A15D9D00E65B41;
 			remoteInfo = kk_ihex;
-		};
-		4ED0BF2118A15A8300E81BB4 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4EA4811418A131FF00BA2CE1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4EA4813618A132A800BA2CE1;
-			remoteInfo = bin2ihex;
-		};
-		4ED0BF2318A15A8300E81BB4 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4EA4811418A131FF00BA2CE1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4EA4814518A132D400BA2CE1;
-			remoteInfo = ihex2bin;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -66,20 +51,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
-		4ED0BF1A18A159FF00E81BB4 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 12;
-			dstPath = "";
-			dstSubfolderSpec = 16;
-			files = (
-				4ED0BF2518A15A9A00E81BB4 /* ihex_test in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		4E1AAC2518A156AF000ED383 /* ihex_test */ = {isa = PBXFileReference; explicitFileType = text.script; path = ihex_test; sourceTree = SOURCE_ROOT; };
 		4E2D127418A15D9D00E65B41 /* libkk_ihex.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libkk_ihex.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4EA4812818A1327F00BA2CE1 /* bin2ihex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bin2ihex.c; sourceTree = SOURCE_ROOT; };
 		4EA4812918A1327F00BA2CE1 /* ihex2bin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ihex2bin.c; sourceTree = SOURCE_ROOT; };
@@ -92,7 +66,6 @@
 		4EA4813B18A132A800BA2CE1 /* bin2ihex.1 */ = {isa = PBXFileReference; explicitFileType = text.man; path = bin2ihex.1; sourceTree = SOURCE_ROOT; };
 		4EA4814618A132D400BA2CE1 /* ihex2bin */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ihex2bin; sourceTree = BUILT_PRODUCTS_DIR; };
 		4EA4814A18A132D400BA2CE1 /* ihex2bin.1 */ = {isa = PBXFileReference; explicitFileType = text.man; path = ihex2bin.1; sourceTree = SOURCE_ROOT; };
-		4ED0BF1C18A159FF00E81BB4 /* ihex_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ihex_test; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -134,7 +107,6 @@
 				4EA4812D18A1327F00BA2CE1 /* kk_ihex_write.h */,
 				4EA4812818A1327F00BA2CE1 /* bin2ihex.c */,
 				4EA4813B18A132A800BA2CE1 /* bin2ihex.1 */,
-				4E1AAC2518A156AF000ED383 /* ihex_test */,
 				4EA4811D18A131FF00BA2CE1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -144,7 +116,6 @@
 			children = (
 				4EA4813718A132A800BA2CE1 /* bin2ihex */,
 				4EA4814618A132D400BA2CE1 /* ihex2bin */,
-				4ED0BF1C18A159FF00E81BB4 /* ihex_test */,
 				4E2D127418A15D9D00E65B41 /* libkk_ihex.a */,
 			);
 			name = Products;
@@ -218,23 +189,6 @@
 			productReference = 4EA4814618A132D400BA2CE1 /* ihex2bin */;
 			productType = "com.apple.product-type.tool";
 		};
-		4ED0BF1B18A159FF00E81BB4 /* ihex_test */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4ED0BF1E18A159FF00E81BB4 /* Build configuration list for PBXNativeTarget "ihex_test" */;
-			buildPhases = (
-				4ED0BF1A18A159FF00E81BB4 /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				4ED0BF2218A15A8300E81BB4 /* PBXTargetDependency */,
-				4ED0BF2418A15A8300E81BB4 /* PBXTargetDependency */,
-			);
-			name = ihex_test;
-			productName = ihex_test;
-			productReference = 4ED0BF1C18A159FF00E81BB4 /* ihex_test */;
-			productType = "com.apple.product-type.tool";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -258,7 +212,6 @@
 			targets = (
 				4EA4813618A132A800BA2CE1 /* bin2ihex */,
 				4EA4814518A132D400BA2CE1 /* ihex2bin */,
-				4ED0BF1B18A159FF00E81BB4 /* ihex_test */,
 				4E2D127318A15D9D00E65B41 /* kk_ihex */,
 			);
 		};
@@ -297,16 +250,6 @@
 			isa = PBXTargetDependency;
 			target = 4E2D127318A15D9D00E65B41 /* kk_ihex */;
 			targetProxy = 4E06FF8518A15EEA00C6B357 /* PBXContainerItemProxy */;
-		};
-		4ED0BF2218A15A8300E81BB4 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4EA4813618A132A800BA2CE1 /* bin2ihex */;
-			targetProxy = 4ED0BF2118A15A8300E81BB4 /* PBXContainerItemProxy */;
-		};
-		4ED0BF2418A15A8300E81BB4 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4EA4814518A132D400BA2CE1 /* ihex2bin */;
-			targetProxy = 4ED0BF2318A15A8300E81BB4 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -473,30 +416,6 @@
 			};
 			name = Release;
 		};
-		4ED0BF1F18A159FF00E81BB4 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				MACOSX_DEPLOYMENT_TARGET = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		4ED0BF2018A159FF00E81BB4 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				MACOSX_DEPLOYMENT_TARGET = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -532,15 +451,6 @@
 			buildConfigurations = (
 				4EA4814D18A132D400BA2CE1 /* Debug */,
 				4EA4814E18A132D400BA2CE1 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		4ED0BF1E18A159FF00E81BB4 /* Build configuration list for PBXNativeTarget "ihex_test" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4ED0BF1F18A159FF00E81BB4 /* Debug */,
-				4ED0BF2018A159FF00E81BB4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
