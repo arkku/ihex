@@ -77,7 +77,7 @@ void ihex_end_read(struct ihex_state *ihex);
 // by `line_length` greater than `length`. Unknown record types and
 // other erroneous data is usually silently ignored by this minimalistic
 // parser. (It is recommended to compute a hash over the complete data
-// once received and verify that against the source).
+// once received and verify that against the source.)
 //
 // Example implementation:
 //
