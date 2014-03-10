@@ -25,7 +25,7 @@ Basic usage for writing binary data as IHEX ASCII:
     ihex_end_write(&ihex);
 
 The function `ihex_write_bytes` may be called multiple times to pass any
-amount of ASCII data at a time.
+amount of data at a time.
 
 The actual writing is done by a callback called `ihex_flush_buffer`,
 which must be implemented, e.g., as follows:
@@ -50,7 +50,7 @@ Basic usage for reading ASCII IHEX into binary data:
     ihex_end_read(&ihex);
 
 The function `ihex_read_bytes` may be called multiple times to pass any
-amount of binary data at a time.
+amount of data at a time.
 
 The reading functions call the function `ihex_data_read`, which must be
 implemented by the caller to store the binary data, e.g., as follows:
