@@ -15,7 +15,7 @@
 #define ADDRESS_HIGH_MASK ((ihex_address_t) 0xFFFF0000U)
 #define ADDRESS_HIGH_BYTES(addr) ((addr) >> 16)
 
-#define HEX_DIGIT(n) ((n) + ( ((n) < 10U) ? '0' : ('A' - 10)))
+#define HEX_DIGIT(n) ((char)(((char)(n)) + ( ((n) < 10U) ? (char)'0' : (char)('A' - 10))))
 
 #ifndef IHEX_EXTERNAL_WRITE_BUFFER
 static char ihex_write_buffer[IHEX_WRITE_BUFFER_LENGTH];
