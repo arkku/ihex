@@ -144,7 +144,7 @@ extern void ihex_flush_buffer(struct ihex_state *ihex,
 // segments are not automatically incremented when the 16-bit address
 // overflows (the default is to use 32-bit linear addressing). For segmented
 // 20-bit addressing you must manually ensure that a write does not overflow
-// the segment boundary, and call `ihex_write_at_segment` to every time the
+// the segment boundary, and call `ihex_write_at_segment` every time the
 // segment needs to be changed.
 //
 #ifndef IHEX_DISABLE_SEGMENTS
@@ -160,4 +160,4 @@ void ihex_set_output_line_length(struct ihex_state *ihex, uint8_t line_length);
 #ifdef __cplusplus
 }
 #endif
-#endif // !KK_IHEX_H
+#endif // !KK_IHEX_WRITE_H
