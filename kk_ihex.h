@@ -98,7 +98,7 @@
  * this is a fairly pointless optimisation.
  *
  *
- * Copyright (c) 2013-2014 Kimmo Kulovesi, http://arkku.com/
+ * Copyright (c) 2013-2015 Kimmo Kulovesi, http://arkku.com/
  * Provided with absolutely no warranty, use at your own risk only.
  * Use and distribute freely, mark modified copies as such.
  */
@@ -106,13 +106,20 @@
 #ifndef KK_IHEX_H
 #define KK_IHEX_H
 
-#define KK_IHEX_VERSION "2014-02-25"
+#define KK_IHEX_VERSION "2015-02-22"
 
 #include <stdint.h>
+
+#ifdef IHEX_USE_STDBOOL
 #include <stdbool.h>
+typedef bool ihex_bool_t;
+#else
+typedef uint_fast8_t ihex_bool_t;
+#endif
 
 typedef uint_least32_t ihex_address_t;
 typedef uint_least16_t ihex_segment_t;
+typedef unsigned int ihex_count_t;
 
 // Maximum number of data bytes per line (applies to both reading and
 // writing!); specify 255 to support reading all possible lengths. Less
@@ -144,6 +151,7 @@ enum ihex_record_type {
     IHEX_EXTENDED_LINEAR_ADDRESS_RECORD,
     IHEX_START_LINEAR_ADDRESS_RECORD
 };
+typedef uint8_t ihex_record_type_t;
 
 #ifndef IHEX_DISABLE_SEGMENTS
 

@@ -31,7 +31,7 @@
  * data bytes per line.
  *
  *
- * Copyright (c) 2013-2014 Kimmo Kulovesi, http://arkku.com/
+ * Copyright (c) 2013-2015 Kimmo Kulovesi, http://arkku.com/
  * Provided with absolutely no warranty, use at your own risk only.
  * Use and distribute freely, mark modified copies as such.
  */
@@ -50,14 +50,15 @@ void ihex_begin_read(struct ihex_state *ihex);
 // Begin reading at `address` (the lowest 16 bits of which will be ignored);
 // this is required only if the high bytes of the 32-bit starting address
 // are not specified in the input data and they are non-zero
-void ihex_read_at_address(struct ihex_state *ihex, ihex_address_t address);
+void ihex_read_at_address(struct ihex_state *ihex,
+                          ihex_address_t address);
 
 // Read a single byte
-void ihex_read_byte(struct ihex_state *ihex, int c);
+void ihex_read_byte(struct ihex_state *ihex, int chr);
 
 // Read `count` bytes from `data`
 void ihex_read_bytes(struct ihex_state * restrict ihex, char * restrict data,
-                     unsigned int count);
+                     ihex_count_t count);
 
 // End reading (may call `ihex_data_read` if there is data waiting)
 void ihex_end_read(struct ihex_state *ihex);
@@ -81,8 +82,9 @@ void ihex_end_read(struct ihex_state *ihex);
 //
 // Example implementation:
 //
-//      bool ihex_data_read(struct ihex_state *ihex,
-//                          enum ihex_record_type type, bool error) {
+//      ihex_bool_t ihex_data_read(struct ihex_state *ihex,
+//                                 ihex_record_type_t type,
+//                                 ihex_bool_t error) {
 //          error = error || (ihex->length < ihex->line_length);
 //          if (type == IHEX_DATA_RECORD && !error) {
 //              (void) fseek(outfile, IHEX_LINEAR_ADDRESS(ihex), SEEK_SET);
@@ -93,9 +95,9 @@ void ihex_end_read(struct ihex_state *ihex);
 //          return !error;
 //      }
 //
-extern bool ihex_data_read(struct ihex_state *ihex,
-                           enum ihex_record_type type,
-                           bool checksum_mismatch);
+extern ihex_bool_t ihex_data_read(struct ihex_state *ihex,
+                                  ihex_record_type_t type,
+                                  ihex_bool_t checksum_mismatch);
 
 // Begin reading at `segment`; this is required only if the initial segment
 // is not specified in the input data and it is non-zero.

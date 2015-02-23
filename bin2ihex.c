@@ -7,12 +7,13 @@
  * `-a` (also, `-a 0` forces output of the initial offset even
  * though it is the default zero).
  *
- * Copyright (c) 2013-2014 Kimmo Kulovesi, http://arkku.com
+ * Copyright (c) 2013-2015 Kimmo Kulovesi, http://arkku.com
  * Provided with absolutely no warranty, use at your own risk only.
  * Distribute freely, mark modified copies as such.
  */
 
 #include "kk_ihex_write.h"
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>

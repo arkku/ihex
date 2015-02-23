@@ -65,7 +65,7 @@
  * reading any IHEX file.
  *
  *
- * Copyright (c) 2013-2014 Kimmo Kulovesi, http://arkku.com/
+ * Copyright (c) 2013-2015 Kimmo Kulovesi, http://arkku.com/
  * Provided with absolutely no warranty, use at your own risk only.
  * Use and distribute freely, mark modified copies as such.
  */
@@ -101,7 +101,7 @@ extern char *ihex_write_buffer;
 #endif
 
 // Initialise the structure `ihex` for writing
-void ihex_init(struct ihex_state * const ihex);
+void ihex_init(struct ihex_state *ihex);
 
 // Begin writing at the given 32-bit `address` after writing any
 // pending data at the current address.
@@ -115,8 +115,9 @@ void ihex_write_at_address(struct ihex_state *ihex, ihex_address_t address);
 void ihex_write_byte(struct ihex_state *ihex, uint8_t b);
 
 // Write `count` bytes from `data`
-void ihex_write_bytes(struct ihex_state *ihex, uint8_t * restrict data,
-                      unsigned int count);
+void ihex_write_bytes(struct ihex_state * restrict ihex,
+                      uint8_t * restrict data,
+                      ihex_count_t count);
 
 // End writing (flush buffers, write end of file record)
 void ihex_end_write(struct ihex_state *ihex);
@@ -129,7 +130,8 @@ void ihex_end_write(struct ihex_state *ihex);
 //
 // Example implementation:
 //
-//      void ihex_flush_buffer(char *buffer, char *eptr) {
+//      void ihex_flush_buffer(struct ihex_state *ihex,
+//                             char *buffer, char *eptr) {
 //          *eptr = '\0';
 //          (void) fputs(buffer, stdout);
 //      }
@@ -148,7 +150,8 @@ extern void ihex_flush_buffer(struct ihex_state *ihex,
 // segment needs to be changed.
 //
 #ifndef IHEX_DISABLE_SEGMENTS
-void ihex_write_at_segment(struct ihex_state *ihex, ihex_segment_t segment,
+void ihex_write_at_segment(struct ihex_state *ihex,
+                           ihex_segment_t segment,
                            ihex_address_t address);
 #endif
 

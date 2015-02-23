@@ -16,7 +16,7 @@
  * to the first address that would be written (i.e., first byte of
  * data written will be at address 0).
  *
- * Copyright (c) 2013-2014 Kimmo Kulovesi, http://arkku.com
+ * Copyright (c) 2013-2015 Kimmo Kulovesi, http://arkku.com
  * Provided with absolutely no warranty, use at your own risk only.
  * Distribute freely, mark modified copies as such.
  */
@@ -124,9 +124,10 @@ argument_error:
     return EXIT_SUCCESS;
 }
 
-bool
-ihex_data_read (struct ihex_state *ihex, enum ihex_record_type type,
-                bool error) {
+ihex_bool_t
+ihex_data_read (struct ihex_state *ihex,
+                ihex_record_type_t type,
+                ihex_bool_t error) {
     if (error) {
         (void) fprintf(stderr, "Checksum error on line %lu\n", line_number);
         exit(EXIT_FAILURE);

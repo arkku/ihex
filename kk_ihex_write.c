@@ -3,7 +3,7 @@
  *
  * See the header `kk_ihex.h` for instructions.
  *
- * Copyright (c) 2013-2014 Kimmo Kulovesi, http://arkku.com/
+ * Copyright (c) 2013-2015 Kimmo Kulovesi, http://arkku.com/
  * Provided with absolutely no warranty, use at your own risk only.
  * Use and distribute freely, mark modified copies as such.
  */
@@ -46,19 +46,19 @@ ihex_buffer_byte (char * restrict w, const uint8_t byte) {
 }
 
 static char *
-ihex_buffer_word (char * restrict w, const unsigned int word,
+ihex_buffer_word (char * restrict w, const uint_fast16_t word,
                   uint8_t * const restrict checksum) {
-    uint8_t byte = (word & 0xFF00U) >> 8; // high byte
+    uint8_t byte = (word >> 8) & 0xFFU; // high byte
     w = ihex_buffer_byte(w, (uint8_t)byte);
     *checksum += byte;
-    byte = word & 0x00FFU; // low byte
+    byte = word & 0xFFU; // low byte
     *checksum += byte;
     return ihex_buffer_byte(w, (uint8_t)byte);
 }
 
 static char *
 ihex_buffer_newline (char * restrict w) {
-    const char *r = IHEX_NEWLINE_STRING;
+    const char * restrict r = IHEX_NEWLINE_STRING;
     do {
         *w++ = *r++;
     } while (*r);
@@ -70,7 +70,7 @@ ihex_write_end_of_file (struct ihex_state * const ihex) {
     char * restrict w = ihex_write_buffer;
     *w++ = IHEX_START;          // :
 #if 0
-    for (unsigned int i = 7; i; --i) {
+    for (uint_fast8_t i = 7; i; --i) {
         *w++ = '0';
     }
     *w++ = '1';
@@ -90,7 +90,7 @@ ihex_write_end_of_file (struct ihex_state * const ihex) {
 static void
 ihex_write_extended_address (struct ihex_state * const ihex,
                              const ihex_segment_t address,
-                             const enum ihex_record_type type) {
+                             const uint8_t type) {
     char * restrict w = ihex_write_buffer;
     uint8_t sum = type + 2U;
 
@@ -109,7 +109,7 @@ ihex_write_extended_address (struct ihex_state * const ihex,
 //
 static void
 ihex_write_data (struct ihex_state * const ihex) {
-    unsigned int len = ihex->length;
+    uint_fast8_t len = ihex->length;
     uint8_t sum = len;
     char * restrict w = ihex_write_buffer;
 
@@ -132,7 +132,7 @@ ihex_write_data (struct ihex_state * const ihex) {
 
     // 16-bit address
     {
-        unsigned int addr = ihex->address & 0xFFFFU;
+        uint_fast16_t addr = ihex->address & 0xFFFFU;
         ihex->address += len;
         if ((0xFFFFU - addr) < len) {
             // signal address overflow (need to write extended address)
@@ -163,7 +163,7 @@ ihex_write_data (struct ihex_state * const ihex) {
 }
 
 void
-ihex_write_at_address (struct ihex_state *ihex, ihex_address_t address) {
+ihex_write_at_address (struct ihex_state * const ihex, ihex_address_t address) {
     if (ihex->length) {
         // flush any existing data
         ihex_write_data(ihex);
@@ -178,10 +178,14 @@ ihex_write_at_address (struct ihex_state *ihex, ihex_address_t address) {
 }
 
 void
-ihex_set_output_line_length (struct ihex_state *ihex, uint8_t line_length) {
+ihex_set_output_line_length (struct ihex_state * const ihex,
+                             uint8_t line_length) {
+#if IHEX_MAX_OUTPUT_LINE_LENGTH < 255
     if (line_length > IHEX_MAX_OUTPUT_LINE_LENGTH) {
         line_length = IHEX_MAX_OUTPUT_LINE_LENGTH;
-    } else if (!line_length) {
+    } else
+#endif
+    if (!line_length) {
         line_length = IHEX_DEFAULT_OUTPUT_LINE_LENGTH;
     }
     ihex->line_length = line_length;
@@ -189,7 +193,9 @@ ihex_set_output_line_length (struct ihex_state *ihex, uint8_t line_length) {
 
 #ifndef IHEX_DISABLE_SEGMENTS
 void
-ihex_write_at_segment (struct ihex_state *ihex, ihex_segment_t segment, ihex_address_t address) {
+ihex_write_at_segment (struct ihex_state * const ihex,
+                       ihex_segment_t segment,
+                       ihex_address_t address) {
     ihex_write_at_address(ihex, address);
     if (ihex->segment != segment) {
         // clear segment
@@ -200,7 +206,7 @@ ihex_write_at_segment (struct ihex_state *ihex, ihex_segment_t segment, ihex_add
 #endif
 
 void
-ihex_write_byte (struct ihex_state *ihex, uint8_t byte) {
+ihex_write_byte (struct ihex_state * const ihex, uint8_t byte) {
     if (ihex->line_length <= ihex->length) {
         ihex_write_data(ihex);
     }
@@ -208,19 +214,14 @@ ihex_write_byte (struct ihex_state *ihex, uint8_t byte) {
 }
 
 void
-ihex_end_write (struct ihex_state *ihex) {
-    ihex_write_data(ihex); // flush any remaining data
-    ihex_write_end_of_file(ihex);
-}
-
-void
-ihex_write_bytes (struct ihex_state *ihex, uint8_t * restrict r,
-                  unsigned int count) {
+ihex_write_bytes (struct ihex_state * restrict const ihex,
+                  uint8_t * restrict r,
+                  ihex_count_t count) {
     while (count) {
         if (ihex->line_length > ihex->length) {
-            unsigned int i = ihex->line_length - ihex->length;
-            uint8_t *w = &(ihex->data[ihex->length]);
-            i = (i > count) ? count : i;
+            uint_fast8_t i = ihex->line_length - ihex->length;
+            uint8_t *w = ihex->data + ihex->length;
+            i = (i > count) ? (uint_fast8_t)count : i;
             count -= i;
             ihex->length += i;
             do {
@@ -230,5 +231,11 @@ ihex_write_bytes (struct ihex_state *ihex, uint8_t * restrict r,
             ihex_write_data(ihex);
         }
     }
+}
+
+void
+ihex_end_write (struct ihex_state * const ihex) {
+    ihex_write_data(ihex); // flush any remaining data
+    ihex_write_end_of_file(ihex);
 }
 

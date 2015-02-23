@@ -3,7 +3,7 @@
  *
  * See the header `kk_ihex.h` for instructions.
  *
- * Copyright (c) 2013-2014 Kimmo Kulovesi, http://arkku.com/
+ * Copyright (c) 2013-2015 Kimmo Kulovesi, http://arkku.com/
  * Provided with absolutely no warranty, use at your own risk only.
  * Use and distribute freely, mark modified copies as such.
  */
@@ -33,7 +33,7 @@ enum ihex_read_state {
 #define IHEX_READ_STATE_OFFSET 3
 
 void
-ihex_begin_read (struct ihex_state *ihex) {
+ihex_begin_read (struct ihex_state * const ihex) {
     ihex->address = 0;
 #ifndef IHEX_DISABLE_SEGMENTS
     ihex->segment = 0;
@@ -44,14 +44,14 @@ ihex_begin_read (struct ihex_state *ihex) {
 }
 
 void
-ihex_read_at_address (struct ihex_state *ihex, ihex_address_t address) {
+ihex_read_at_address (struct ihex_state * const ihex, ihex_address_t address) {
     ihex_begin_read(ihex);
     ihex->address = address;
 }
 
 #ifndef IHEX_DISABLE_SEGMENTS
 void
-ihex_read_at_segment (struct ihex_state *ihex, ihex_segment_t segment) {
+ihex_read_at_segment (struct ihex_state * const ihex, ihex_segment_t segment) {
     ihex_begin_read(ihex);
     ihex->segment = segment;
 }
@@ -59,8 +59,8 @@ ihex_read_at_segment (struct ihex_state *ihex, ihex_segment_t segment) {
 
 void
 ihex_end_read (struct ihex_state * const ihex) {
-    enum ihex_record_type type = ihex->flags & IHEX_READ_RECORD_TYPE_MASK;
-    unsigned int len = ihex->length;
+    uint_fast8_t type = ihex->flags & IHEX_READ_RECORD_TYPE_MASK;
+    uint_fast8_t len = ihex->length;
     uint8_t * const eptr = ihex->data + len; // checksum stored at the end
     if (len == 0 && type == IHEX_DATA_RECORD) {
         return;
@@ -68,8 +68,9 @@ ihex_end_read (struct ihex_state * const ihex) {
     {
         // compute checksum
         const uint8_t *r = ihex->data;
-        unsigned int sum = len + type + (ihex->address & 0x00FFU) +
-                           ((ihex->address & 0xFF00U) >> 8);
+        uint_fast8_t sum = len + type +
+                           (ihex->address & 0xFFU) +
+                           ((ihex->address >> 8) & 0xFFU);
         while (r != eptr) {
             sum += *r++;
         }
@@ -91,8 +92,9 @@ ihex_end_read (struct ihex_state * const ihex) {
 }
 
 void
-ihex_read_byte (struct ihex_state *ihex, int b) {
-    unsigned int len = ihex->length;
+ihex_read_byte (struct ihex_state * const ihex, const int byte) {
+    uint_fast8_t b = (uint_fast8_t) byte;
+    uint_fast8_t len = ihex->length;
     uint_fast8_t state = (ihex->flags & IHEX_READ_STATE_MASK);
     ihex->flags ^= state; // turn off the old state
     state >>= IHEX_READ_STATE_OFFSET;
@@ -114,7 +116,8 @@ ihex_read_byte (struct ihex_state *ihex, int b) {
 
     if (!(++state & 1)) {
         // high nybble, store temporarily at end of data:
-        ihex->data[len] = b << 4;
+        b <<= 4;
+        ihex->data[len] = b;
     } else {
         // low nybble, combine with stored high nybble:
         b = (ihex->data[len] |= b);
@@ -135,10 +138,11 @@ ihex_read_byte (struct ihex_state *ihex, int b) {
         case (READ_ADDRESS_MSB_LOW >> 1):
             // high byte of 16-bit address
             ihex->address = (ihex->address & ADDRESS_HIGH_MASK);
-            b <<= 8;
+            ihex->address |= ((ihex_address_t) b) << 8U;
+            break;
         case (READ_ADDRESS_LSB_LOW >> 1):
             // low byte of 16-bit address
-            ihex->address |= (unsigned) b;
+            ihex->address |= (ihex_address_t) b;
             break;
         case (READ_RECORD_TYPE_LOW >> 1):
             // record type
@@ -166,8 +170,9 @@ save_read_state:
 }
 
 void
-ihex_read_bytes (struct ihex_state * restrict ihex, char * restrict data,
-                 unsigned int count) {
+ihex_read_bytes (struct ihex_state * restrict ihex,
+                 char * restrict data,
+                 ihex_count_t count) {
     while (count--) {
         ihex_read_byte(ihex, *data++);
     }
