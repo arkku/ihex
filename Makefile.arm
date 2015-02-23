@@ -5,7 +5,7 @@ LDFLAGS=-Wl,--gc-sections
 AR=$(CROSS)ar
 ARFLAGS=rcs
 
-AVR_FLAGS=-DIHEX_DISABLE_SEGMENTS -DIHEX_LINE_MAX_LENGTH=32
+ARM_FLAGS=-DIHEX_DISABLE_SEGMENTS -DIHEX_LINE_MAX_LENGTH=32
 
 OBJPATH = ./arm/
 OBJS = $(OBJPATH)kk_ihex_write.o $(OBJPATH)kk_ihex_read.o
@@ -24,7 +24,7 @@ $(LIB): $(OBJS)
 	$(AR) $(ARFLAGS) $@ $+
 
 $(OBJPATH)%.o: %.c %.h
-	$(CC) $(CFLAGS) $(AVR_FLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(ARM_FLAGS) -c $< -o $@
 
 $(sort $(LIBPATH) $(OBJPATH)):
 	@mkdir -p $@
