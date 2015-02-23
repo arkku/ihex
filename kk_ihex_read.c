@@ -60,27 +60,25 @@ ihex_read_at_segment (struct ihex_state * const ihex, ihex_segment_t segment) {
 void
 ihex_end_read (struct ihex_state * const ihex) {
     uint_fast8_t type = ihex->flags & IHEX_READ_RECORD_TYPE_MASK;
-    uint_fast8_t len = ihex->length;
-    uint8_t * const eptr = ihex->data + len; // checksum stored at the end
-    if (len == 0 && type == IHEX_DATA_RECORD) {
+    uint_fast8_t sum;
+    if ((sum = ihex->length) == 0 && type == IHEX_DATA_RECORD) {
         return;
     }
     {
-        // compute checksum
+        // compute and validate checksum
+        const uint8_t * const eptr = ihex->data + sum;
         const uint8_t *r = ihex->data;
-        uint_fast8_t sum = len + type +
-                           (ihex->address & 0xFFU) +
-                           ((ihex->address >> 8) & 0xFFU);
+        sum += type + (ihex->address & 0xFFU) + ((ihex->address >> 8) & 0xFFU);
         while (r != eptr) {
             sum += *r++;
         }
-        *eptr ^= ~sum + 1U;
+        sum = (~sum + 1U) ^ *eptr; // *eptr is the received checksum
     }
-    if (ihex_data_read(ihex, type, *eptr)) {
+    if (ihex_data_read(ihex, type, sum)) {
         if (type == IHEX_EXTENDED_LINEAR_ADDRESS_RECORD) {
             ihex->address &= 0xFFFFU;
-            ihex->address |= ((ihex_address_t) ihex->data[0]) << 24;
-            ihex->address |= ((ihex_address_t) ihex->data[1]) << 16;
+            ihex->address |= (((ihex_address_t) ihex->data[0]) << 24) |
+                             (((ihex_address_t) ihex->data[1]) << 16);
 #ifndef IHEX_DISABLE_SEGMENTS
         } else if (type == IHEX_EXTENDED_SEGMENT_ADDRESS_RECORD) {
             ihex->segment = (ihex_segment_t) ((ihex->data[0] << 8) | ihex->data[1]);
