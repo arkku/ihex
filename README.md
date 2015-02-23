@@ -35,7 +35,12 @@ which must be implemented, e.g., as follows:
         (void) fputs(buffer, stdout);
     }
 
+The length of the buffer can be obtained from `eptr - buffer`. The actual
+implementation may of course do with the IHEX data as it pleases, e.g.,
+transmit it over a serial port.
+
 For a complete example, see the included program `bin2ihex.c`.
+
 
 Reading
 =======
@@ -55,9 +60,9 @@ amount of data at a time.
 The reading functions call the function `ihex_data_read`, which must be
 implemented by the caller to store the binary data, e.g., as follows:
 
-    bool ihex_data_read (struct ihex_state *ihex,
-                         enum ihex_record_type type,
-                         bool checksum_error) {
+    ihex_bool_t ihex_data_read (struct ihex_state *ihex,
+                                ihex_record_type_t type,
+                                ihex_bool_t checksum_error) {
         if (type == IHEX_DATA_RECORD) {
             unsigned long address = (unsigned long) IHEX_LINEAR_ADDRESS(ihex);
             (void) fseek(outfile, address, SEEK_SET);
@@ -67,6 +72,9 @@ implemented by the caller to store the binary data, e.g., as follows:
         }
         return true;
     }
+
+Of course an actual implementation is free to do with the data as it chooses,
+e.g., burn it on an EEPROM instead of writing it to a file.
 
 For an example complete with error handling, see the included program
 `ihex2bin.c`.
