@@ -106,7 +106,7 @@
 #ifndef KK_IHEX_H
 #define KK_IHEX_H
 
-#define KK_IHEX_VERSION "2015-02-22"
+#define KK_IHEX_VERSION "2015-02-26"
 
 #include <stdint.h>
 
@@ -119,7 +119,7 @@ typedef uint_fast8_t ihex_bool_t;
 
 typedef uint_least32_t ihex_address_t;
 typedef uint_least16_t ihex_segment_t;
-typedef unsigned int ihex_count_t;
+typedef int ihex_count_t;
 
 // Maximum number of data bytes per line (applies to both reading and
 // writing!); specify 255 to support reading all possible lengths. Less
@@ -129,19 +129,21 @@ typedef unsigned int ihex_count_t;
 #define IHEX_LINE_MAX_LENGTH 255
 #endif
 
-typedef struct ihex_state {
-    ihex_address_t address;
-#ifndef IHEX_DISABLE_SEGMENTS
-    ihex_segment_t segment;
-#endif
-    uint8_t flags;
-    uint8_t line_length;
-    uint8_t length;
-    uint8_t data[IHEX_LINE_MAX_LENGTH + 1];
-} kk_ihex_t;
+enum ihex_flags {
+    IHEX_FLAG_ADDRESS_OVERFLOW = 0x80   // 16-bit address overflow
+};
+typedef uint8_t ihex_flags_t;
 
-#define IHEX_FLAG_ADDRESS_OVERFLOW  0x80    // 16-bit address overflow
-// (Other flags are reserved for internal use!)
+typedef struct ihex_state {
+    ihex_address_t  address;
+#ifndef IHEX_DISABLE_SEGMENTS
+    ihex_segment_t  segment;
+#endif
+    ihex_flags_t    flags;
+    uint8_t         line_length;
+    uint8_t         length;
+    uint8_t         data[IHEX_LINE_MAX_LENGTH + 1];
+} kk_ihex_t;
 
 enum ihex_record_type {
     IHEX_DATA_RECORD,

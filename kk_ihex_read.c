@@ -135,7 +135,7 @@ ihex_read_byte (struct ihex_state * const ihex, const int byte) {
             break;
         case (READ_ADDRESS_MSB_LOW >> 1):
             // high byte of 16-bit address
-            ihex->address = (ihex->address & ADDRESS_HIGH_MASK);
+            ihex->address &= ADDRESS_HIGH_MASK; // clear the 16-bit address
             ihex->address |= ((ihex_address_t) b) << 8U;
             break;
         case (READ_ADDRESS_LSB_LOW >> 1):

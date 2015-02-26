@@ -40,7 +40,7 @@ int
 main (int argc, char *argv[]) {
     struct ihex_state ihex;
     FILE *infile = stdin;
-    unsigned int count;
+    ihex_count_t count;
     char buf[256];
 
     outfile = stdout;
@@ -98,7 +98,7 @@ invalid_argument:
         (void) fprintf(stderr, "Invalid argument: %s\n", arg);
 usage:
         (void) fprintf(stderr, "kk_ihex " KK_IHEX_VERSION
-                               " - Copyright (c) 2013-2014 Kimmo Kulovesi\n");
+                               " - Copyright (c) 2013-2015 Kimmo Kulovesi\n");
         (void) fprintf(stderr, "Usage: ihex2bin ([-a <address_offset>]|[-A])"
                                 " [-o <out.bin>] [-i <in.hex>] [-v]\n");
         return arg ? EXIT_FAILURE : EXIT_SUCCESS;
@@ -111,7 +111,7 @@ argument_error:
                                 (ihex_address_t) address_offset :
                                 0);
     while (fgets(buf, sizeof(buf), infile)) {
-        count = (unsigned int) strlen(buf);
+        count = (ihex_count_t) strlen(buf);
         ihex_read_bytes(&ihex, buf, count);
         line_number += (count && buf[count - 1] == '\n') ? 1 : 0;
     }

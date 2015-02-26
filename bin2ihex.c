@@ -33,7 +33,7 @@ main (int argc, char *argv[]) {
     ihex_address_t initial_address = 0;
     bool write_initial_address = 0;
     bool debug_enabled = 0;
-    unsigned int count;
+    ihex_count_t count;
     uint8_t buf[1024];
 
     outfile = stdout;
@@ -90,7 +90,7 @@ invalid_argument:
         (void) fprintf(stderr, "Invalid argument: %s\n", arg);
 usage:
         (void) fprintf(stderr, "kk_ihex " KK_IHEX_VERSION
-                               " - Copyright (c) 2013-2014 Kimmo Kulovesi\n");
+                               " - Copyright (c) 2013-2015 Kimmo Kulovesi\n");
         (void) fprintf(stderr, "Usage: bin2ihex [-a <address_offset>]"
                                " [-o <out.hex>] [-i <in.bin>] [-v]\n");
         return arg ? EXIT_FAILURE : EXIT_SUCCESS;
@@ -114,7 +114,7 @@ argument_error:
             }
             ihex.flags |= IHEX_FLAG_ADDRESS_OVERFLOW;
         }
-        while ((count = (unsigned int) fread(buf, 1, sizeof(buf), infile))) {
+        while ((count = (ihex_count_t) fread(buf, 1, sizeof(buf), infile))) {
             ihex_write_bytes(&ihex, buf, count);
         }
         ihex_end_write(&ihex);

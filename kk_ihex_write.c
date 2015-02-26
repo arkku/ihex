@@ -68,14 +68,12 @@ ihex_buffer_newline (char * restrict w) {
 static void
 ihex_write_end_of_file (struct ihex_state * const ihex) {
     char * restrict w = ihex_write_buffer;
-    *w++ = IHEX_START;          // :
-#if 0
-    for (uint_fast8_t i = 7; i; --i) {
-        *w++ = '0';
-    }
-    *w++ = '1';
-    *w++ = 'F';
-    *w++ = 'F';
+    *w++ = IHEX_START; // :
+#if 1
+    *w++ = '0'; *w++ = '0'; // length
+    *w++ = '0'; *w++ = '0'; *w++ = '0'; *w++ = '0'; // address
+    *w++ = '0'; *w++ = '1'; // record type
+    *w++ = 'F'; *w++ = 'F'; // checksum
 #else
     w = ihex_buffer_byte(w, 0); // length
     w = ihex_buffer_byte(w, 0); // address msb
@@ -94,11 +92,11 @@ ihex_write_extended_address (struct ihex_state * const ihex,
     char * restrict w = ihex_write_buffer;
     uint8_t sum = type + 2U;
 
-    *w++ = IHEX_START;          // :
-    w = ihex_buffer_byte(w, 2U); // length
-    w = ihex_buffer_byte(w, 0); // 16-bit address msb
-    w = ihex_buffer_byte(w, 0); // 16-bit address lsb
-    w = ihex_buffer_byte(w, type); // record type
+    *w++ = IHEX_START;              // :
+    w = ihex_buffer_byte(w, 2U);    // length
+    w = ihex_buffer_byte(w, 0);     // 16-bit address msb
+    w = ihex_buffer_byte(w, 0);     // 16-bit address lsb
+    w = ihex_buffer_byte(w, type);  // record type
     w = ihex_buffer_word(w, address, &sum); // high bytes of address
     w = ihex_buffer_byte(w, (uint8_t)~sum + 1U); // checksum
     w = ihex_buffer_newline(w);
