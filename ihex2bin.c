@@ -113,7 +113,7 @@ argument_error:
     while (fgets(buf, sizeof(buf), infile)) {
         count = (ihex_count_t) strlen(buf);
         ihex_read_bytes(&ihex, buf, count);
-        line_number += (count && buf[count - 1] == '\n') ? 1 : 0;
+        line_number += (count && buf[count - 1] == '\n');
     }
     ihex_end_read(&ihex);
 

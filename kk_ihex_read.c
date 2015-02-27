@@ -171,8 +171,9 @@ void
 ihex_read_bytes (struct ihex_state * restrict ihex,
                  char * restrict data,
                  ihex_count_t count) {
-    while (count--) {
+    while (count > 0) {
         ihex_read_byte(ihex, *data++);
+        --count;
     }
 }
 

@@ -15,7 +15,7 @@
 #define ADDRESS_HIGH_MASK ((ihex_address_t) 0xFFFF0000U)
 #define ADDRESS_HIGH_BYTES(addr) ((addr) >> 16)
 
-#define HEX_DIGIT(n) ((char)(((char)(n)) + ( ((n) < 10U) ? (char)'0' : (char)('A' - 10))))
+#define HEX_DIGIT(n) ((char)((n) + (((n) < 10) ? '0' : ('A' - 10))))
 
 #ifndef IHEX_EXTERNAL_WRITE_BUFFER
 static char ihex_write_buffer[IHEX_WRITE_BUFFER_LENGTH];
@@ -215,7 +215,7 @@ void
 ihex_write_bytes (struct ihex_state * restrict const ihex,
                   uint8_t * restrict r,
                   ihex_count_t count) {
-    while (count) {
+    while (count > 0) {
         if (ihex->line_length > ihex->length) {
             uint_fast8_t i = ihex->line_length - ihex->length;
             uint8_t *w = ihex->data + ihex->length;
