@@ -213,7 +213,7 @@ ihex_write_byte (struct ihex_state * const ihex, uint8_t byte) {
 
 void
 ihex_write_bytes (struct ihex_state * restrict const ihex,
-                  uint8_t * restrict r,
+                  const uint8_t * restrict r,
                   ihex_count_t count) {
     while (count > 0) {
         if (ihex->line_length > ihex->length) {

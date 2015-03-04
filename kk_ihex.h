@@ -106,7 +106,7 @@
 #ifndef KK_IHEX_H
 #define KK_IHEX_H
 
-#define KK_IHEX_VERSION "2015-02-26"
+#define KK_IHEX_VERSION "2015-03-04"
 
 #include <stdint.h>
 

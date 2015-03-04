@@ -1,5 +1,5 @@
 /*
- * kk_ihex_read.h: A simple library for reaing Intel HEX data. See
+ * kk_ihex_read.h: A simple library for reading Intel HEX data. See
  * the accompanying kk_ihex_write.h for IHEX write support.
  *
  *
@@ -53,11 +53,12 @@ void ihex_begin_read(struct ihex_state *ihex);
 void ihex_read_at_address(struct ihex_state *ihex,
                           ihex_address_t address);
 
-// Read a single byte
-void ihex_read_byte(struct ihex_state *ihex, int chr);
+// Read a single character
+void ihex_read_byte(struct ihex_state *ihex, char chr);
 
 // Read `count` bytes from `data`
-void ihex_read_bytes(struct ihex_state * restrict ihex, char * restrict data,
+void ihex_read_bytes(struct ihex_state * restrict ihex,
+                     const char * restrict data,
                      ihex_count_t count);
 
 // End reading (may call `ihex_data_read` if there is data waiting)

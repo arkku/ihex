@@ -116,7 +116,7 @@ void ihex_write_byte(struct ihex_state *ihex, uint8_t b);
 
 // Write `count` bytes from `data`
 void ihex_write_bytes(struct ihex_state * restrict ihex,
-                      uint8_t * restrict data,
+                      const uint8_t * restrict data,
                       ihex_count_t count);
 
 // End writing (flush buffers, write end of file record)

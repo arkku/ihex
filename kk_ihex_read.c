@@ -90,7 +90,7 @@ ihex_end_read (struct ihex_state * const ihex) {
 }
 
 void
-ihex_read_byte (struct ihex_state * const ihex, const int byte) {
+ihex_read_byte (struct ihex_state * const ihex, const char byte) {
     uint_fast8_t b = (uint_fast8_t) byte;
     uint_fast8_t len = ihex->length;
     uint_fast8_t state = (ihex->flags & IHEX_READ_STATE_MASK);
@@ -169,7 +169,7 @@ save_read_state:
 
 void
 ihex_read_bytes (struct ihex_state * restrict ihex,
-                 char * restrict data,
+                 const char * restrict data,
                  ihex_count_t count) {
     while (count > 0) {
         ihex_read_byte(ihex, *data++);
