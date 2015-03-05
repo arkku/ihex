@@ -69,7 +69,7 @@ main (int argc, char *argv[]) {
                     goto invalid_argument;
                 }
                 ++argv;
-                if (!(infile = fopen(*argv, "rb"))) {
+                if (!(infile = fopen(*argv, "r"))) {
                     goto argument_error;
                 }
                 break;
@@ -78,7 +78,7 @@ main (int argc, char *argv[]) {
                     goto invalid_argument;
                 }
                 ++argv;
-                if (!(outfile = fopen(*argv, "w"))) {
+                if (!(outfile = fopen(*argv, "wb"))) {
                     goto argument_error;
                 }
                 break;
