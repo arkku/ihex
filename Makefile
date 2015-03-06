@@ -35,7 +35,7 @@ $(BINPATH)ihex2bin: ihex2bin.o $(LIB)
 $(sort $(BINPATH) $(LIBPATH)):
 	@mkdir -p $@
 
-test: bin2ihex ihex2bin $(TESTFILE)
+test: $(BINPATH)bin2ihex $(BINPATH)ihex2bin $(TESTFILE)
 	@$(TESTER) $(BINPATH)bin2ihex -v -a 0x80 -i '$(TESTFILE)' | \
 	    $(TESTER) $(BINPATH)ihex2bin -A -v | \
 	    diff '$(TESTFILE)' -
