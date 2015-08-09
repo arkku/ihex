@@ -204,22 +204,23 @@ ihex_write_at_segment (struct ihex_state * const ihex,
 #endif
 
 void
-ihex_write_byte (struct ihex_state * const ihex, uint8_t byte) {
+ihex_write_byte (struct ihex_state * const ihex, const int byte) {
     if (ihex->line_length <= ihex->length) {
         ihex_write_data(ihex);
     }
-    ihex->data[(ihex->length)++] = byte;
+    ihex->data[(ihex->length)++] = (uint8_t) byte;
 }
 
 void
 ihex_write_bytes (struct ihex_state * restrict const ihex,
-                  const uint8_t * restrict r,
+                  const void * restrict buf,
                   ihex_count_t count) {
+    const uint8_t *r = buf;
     while (count > 0) {
         if (ihex->line_length > ihex->length) {
             uint_fast8_t i = ihex->line_length - ihex->length;
             uint8_t *w = ihex->data + ihex->length;
-            i = (i > count) ? (uint_fast8_t)count : i;
+            i = ((ihex_count_t) i > count) ? (uint_fast8_t) count : i;
             count -= i;
             ihex->length += i;
             do {

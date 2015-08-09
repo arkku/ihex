@@ -112,11 +112,11 @@ void ihex_init(struct ihex_state *ihex);
 void ihex_write_at_address(struct ihex_state *ihex, ihex_address_t address);
 
 // Write a single byte
-void ihex_write_byte(struct ihex_state *ihex, uint8_t b);
+void ihex_write_byte(struct ihex_state *ihex, int b);
 
 // Write `count` bytes from `data`
 void ihex_write_bytes(struct ihex_state * restrict ihex,
-                      const uint8_t * restrict data,
+                      const void * restrict data,
                       ihex_count_t count);
 
 // End writing (flush buffers, write end of file record)
