@@ -1,0 +1,25 @@
+#######################################
+# Syntax Coloring Map for Streaming
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+ihex_state	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+ihex_begin_read	KEYWORD2
+ihex_read_bytes	KEYWORD2ihex_read_byte	KEYWORD2ihex_end_read	KEYWORD2
+
+ihex_init	KEYWORD2
+ihex_write_at_address	KEYWORD2ihex_write_at_segment	KEYWORD2ihex_write_byte	KEYWORD2ihex_write_bytes	KEYWORD2ihex_flush_buffer	KEYWORD2
+ihex_end_write	KEYWORD2ihex_data_read	KEYWORD2
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+IHEX_FLAG_ADDRESS_OVERFLOW	LITERAL1
