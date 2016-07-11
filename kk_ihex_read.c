@@ -147,7 +147,7 @@ ihex_read_byte (struct ihex_state * const ihex, const char byte) {
             if (b & ~IHEX_READ_RECORD_TYPE_MASK) {
                 // skip unknown record types silently
                 return;
-            } 
+            }
             ihex->flags = (ihex->flags & ~IHEX_READ_RECORD_TYPE_MASK) | b;
             break;
         case (READ_DATA_LOW >> 1):

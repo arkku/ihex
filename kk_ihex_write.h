@@ -1,5 +1,5 @@
 /*
- * kk_ihex_write.h: A simple library for writing Intel HEX data. 
+ * kk_ihex_write.h: A simple library for writing Intel HEX data.
  * See the accompanying kk_ihex_read.h for read support, and the
  * main header kk_ihex.h for the shared parts.
  *

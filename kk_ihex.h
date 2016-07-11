@@ -1,5 +1,5 @@
 /*
- * kk_ihex.h: A simple library for reading and writing the Intel HEX 
+ * kk_ihex.h: A simple library for reading and writing the Intel HEX
  * or IHEX format. Intended mainly for embedded systems, and thus
  * somewhat optimised for size at the expense of error handling and
  * generality.
