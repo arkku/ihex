@@ -74,7 +74,7 @@ ihex_end_read (struct ihex_state * const ihex) {
         }
         sum = (~sum + 1U) ^ *eptr; // *eptr is the received checksum
     }
-    if (ihex_data_read(ihex, type, sum)) {
+    if (ihex_data_read(ihex, type, (uint8_t) sum)) {
         if (type == IHEX_EXTENDED_LINEAR_ADDRESS_RECORD) {
             ihex->address &= 0xFFFFU;
             ihex->address |= (((ihex_address_t) ihex->data[0]) << 24) |
