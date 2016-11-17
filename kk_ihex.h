@@ -129,6 +129,11 @@ typedef int ihex_count_t;
 #define IHEX_LINE_MAX_LENGTH 255
 #endif
 
+#ifdef __GNUC__
+#define restrict __restrict__
+#endif
+
+
 enum ihex_flags {
     IHEX_FLAG_ADDRESS_OVERFLOW = 0x80   // 16-bit address overflow
 };
