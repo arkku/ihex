@@ -129,7 +129,7 @@ typedef int ihex_count_t;
 #define IHEX_LINE_MAX_LENGTH 255
 #endif
 
-#ifdef __GNUC__
+#ifdef __GNUG__
 #define restrict __restrict__
 #endif
 
