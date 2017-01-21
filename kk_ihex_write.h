@@ -72,7 +72,11 @@
 
 #ifndef KK_IHEX_WRITE_H
 #define KK_IHEX_WRITE_H
+
 #ifdef __cplusplus
+#ifndef restrict
+#define restrict
+#endif
 extern "C" {
 #endif
 
