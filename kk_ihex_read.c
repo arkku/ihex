@@ -60,7 +60,7 @@ ihex_read_at_segment (struct ihex_state * const ihex, ihex_segment_t segment) {
 void
 ihex_end_read (struct ihex_state * const ihex) {
     uint_fast8_t type = ihex->flags & IHEX_READ_RECORD_TYPE_MASK;
-    uint_fast8_t sum;
+    uint8_t sum;
     if ((sum = ihex->length) == 0 && type == IHEX_DATA_RECORD) {
         return;
     }
