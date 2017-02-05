@@ -1,0 +1,78 @@
+.Dd February 1, 2014
+.Dt ihex2bin 1
+.Os kk_ihex
+.Sh NAME
+.Nm ihex2bin
+.Nd Convert Intel HEX encoded data to binary
+.Sh SYNOPSIS
+.Nm
+.Op Fl a Ar address_offset | Fl A
+.Op Fl i Ar input_file.hex
+.Op Fl o Ar output_file.bin
+.Op Fl v
+.Sh DESCRIPTION
+.Nm
+reads Intel HEX encoded data from standard input and writes the
+decoded binary data to standard output.
+.Sh OPTIONS
+.Bl -tag -width -indent
+.It Fl a Ar address_offset
+Set the address of the first byte output to
+.Ar address_offset
+- by default the beginning of the output is considered to be at address
+0, which may cause large amounts of padding to be written if the input
+data begins at an offset (e.g., a ROM address for flashing program images)
+.It Fl A
+Autodetect the address offset (see
+.Ar -a
+above), i.e., the first output byte written will have the address of the
+first byte of input - this option should almost always be used!
+.It Fl i Ar file
+Read the Intel HEX input from
+.Ar file
+instead of standard input
+.It Fl o Ar file
+Write the binary output to
+.Ar file
+instead of standard output
+.It Fl v
+Print extra status messages to standard error
+.El
+.Sh EXAMPLES
+Read Intel HEX from
+.Ar input.hex
+and write the binary output to 
+.Ar output.bin
+such that the first byte of input is written as the first byte
+of output (even if the input specifies an address offset):
+.Pp
+.Bd -ragged -offset indent
+.Nm
+.Fl A
+.Fl i
+.Ar input.hex
+.Fl o
+.Ar output.bin
+.Ed
+.Pp
+Read Intel HEX from
+.Ar input.hex
+and write the binary output to
+.Ar output.bin
+such that the first byte of the output has address
+.Ar 0x8000000
+(the beginning of the output is padded if the input data begins
+at a greater address):
+.Bd -ragged -offset indent
+.Nm
+.Fl a
+.Ar 0x8000000
+.Fl i
+.Ar input.hex
+.Fl o
+.Ar output.bin
+.Ed
+.Sh SEE ALSO
+.Xr bin2ihex 1
+.Sh AUTHOR
+.An "Kimmo Kulovesi" Aq http://arkku.com
