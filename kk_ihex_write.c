@@ -166,11 +166,15 @@ ihex_write_at_address (struct ihex_state * const ihex, ihex_address_t address) {
         // flush any existing data
         ihex_write_data(ihex);
     }
-    if ((ihex->address & ADDRESS_HIGH_MASK) != (address & ADDRESS_HIGH_MASK)) {
+
+    const ihex_address_t page = address & ADDRESS_HIGH_MASK;
+    if ((ihex->address & ADDRESS_HIGH_MASK) != page) {
+        // write a new extended address if needed
         ihex->flags |= IHEX_FLAG_ADDRESS_OVERFLOW;
-    } else {
+    } else if (ihex->address != page) {
         ihex->flags &= ~IHEX_FLAG_ADDRESS_OVERFLOW;
     }
+
     ihex->address = address;
     ihex_set_output_line_length(ihex, ihex->line_length);
 }
