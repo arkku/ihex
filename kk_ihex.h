@@ -98,7 +98,7 @@
  * this is a fairly pointless optimisation.
  *
  *
- * Copyright (c) 2013-2015 Kimmo Kulovesi, http://arkku.com/
+ * Copyright (c) 2013-2017 Kimmo Kulovesi, http://arkku.com/
  * Provided with absolutely no warranty, use at your own risk only.
  * Use and distribute freely, mark modified copies as such.
  */
@@ -106,7 +106,7 @@
 #ifndef KK_IHEX_H
 #define KK_IHEX_H
 
-#define KK_IHEX_VERSION "2016-07-11"
+#define KK_IHEX_VERSION "2017-10-05"
 
 #include <stdint.h>
 
