@@ -12,8 +12,6 @@ OBJS = $(OBJPATH)kk_ihex_write.o $(OBJPATH)kk_ihex_read.o
 LIBPATH = ./avr/
 LIB = $(LIBPATH)libkk_ihex.a
 
-.PHONY: all clean distclean test
-
 all: $(LIB)
 
 $(OBJS): kk_ihex.h
@@ -28,6 +26,8 @@ $(OBJPATH)%.o: %.c %.h
 
 $(sort $(LIBPATH) $(OBJPATH)):
 	@mkdir -p $@
+
+.PHONY: all clean distclean
 
 clean:
 	rm -f $(OBJS)

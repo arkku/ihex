@@ -9,7 +9,7 @@ rather than features, generality, or error handling.
 
 See the header file `kk_ihex.h` for documentation, or below for simple examples.
 
-~ [Kimmo Kulovesi](http://arkku.com/), 2013-12-27
+~ [Kimmo Kulovesi](https://arkku.com/), 2013-12-27
 
 Writing
 =======
@@ -94,6 +94,9 @@ Usage by example:
     # of the first byte of the input other than zero):
     bin2ihex -a 0x8000000 -i infile.bin -o outfile.hex
 
+    # Encode 64 input bytes per output IHEX line:
+    bin2ihex -b 64 <infile.bin >outfile.hex
+
     # Simple conversion from IHEX to binary:
     ihex2bin <infile.hex >outfile.bin
 
@@ -113,3 +116,23 @@ the address offset. Otherwise the program will simply fill any unused
 addresses, starting from 0, with zero bytes, which may total mega- or
 even gigabytes.
 
+
+Utilities
+=========
+
+Two additional utilities are provided to help working with ROM images:
+
+* `split16bit` – splits a 16-bit ROM binary into two 8-bit halves
+* `merge16bit` – merges two 8-bit ROM binary halves into a single 16-bit file
+
+Both of these take the filenames of the high and low halves with the
+arguments `-l low.bin` and `-h high.bin`, respectively. For example:
+
+    # Split 16bit.bin into low.bin and high.bin:
+    split16bit -i 16bit.bin -l low.bin -h high.bin
+
+    # Merge low.bin and high.bin into 16bit.bin:
+    merge16bit -o 16bit.bin -l low.bin -h high.bin
+
+These utilities have nothing to with IHEX as such, but they are so small that
+it didn't seem worth the bother to release them separately.

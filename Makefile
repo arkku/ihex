@@ -13,8 +13,6 @@ TESTFILE = $(LIB)
 TESTER = 
 #TESTER = valgrind
 
-.PHONY: all clean distclean test
-
 all: $(BINS) $(LIB)
 
 $(OBJS): kk_ihex.h
@@ -40,6 +38,8 @@ $(BINPATH)merge16bit: merge16bit.c
 
 $(sort $(BINPATH) $(LIBPATH)):
 	@mkdir -p $@
+
+.PHONY: all clean distclean test
 
 test: $(BINPATH)bin2ihex $(BINPATH)ihex2bin $(TESTFILE)
 	@$(TESTER) $(BINPATH)bin2ihex -v -a 0x80 -i '$(TESTFILE)' | \

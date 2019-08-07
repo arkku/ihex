@@ -5,7 +5,9 @@
  * output files can be specified with arguments `-i` and `-o`,
  * respectively. Initial address offset can be set with option
  * `-a` (also, `-a 0` forces output of the initial offset even
- * though it is the default zero).
+ * though it is the default zero). The number of bytes to encode
+ * into a single line of output (which will be more than twice
+ * that length in bytes) can be given with the argument `-b`.
  *
  * Copyright (c) 2013-2019 Kimmo Kulovesi, https://arkku.com
  * Provided with absolutely no warranty, use at your own risk only.

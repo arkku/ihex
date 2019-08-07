@@ -65,7 +65,7 @@
  * reading any IHEX file.
  *
  *
- * Copyright (c) 2013-2017 Kimmo Kulovesi, http://arkku.com/
+ * Copyright (c) 2013-2019 Kimmo Kulovesi, https://arkku.com/
  * Provided with absolutely no warranty, use at your own risk only.
  * Use and distribute freely, mark modified copies as such.
  */
