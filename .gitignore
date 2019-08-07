@@ -2,6 +2,10 @@
 *.a
 bin2ihex
 ihex2bin
+split16bit
+merge16bit
+*.hex
+*.bin
 xcuserdata
 *.xcodeproj/*.xcworkspace
 build/

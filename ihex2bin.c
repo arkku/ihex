@@ -16,7 +16,7 @@
  * to the first address that would be written (i.e., first byte of
  * data written will be at address 0).
  *
- * Copyright (c) 2013-2015 Kimmo Kulovesi, http://arkku.com
+ * Copyright (c) 2013-2019 Kimmo Kulovesi, https://arkku.com
  * Provided with absolutely no warranty, use at your own risk only.
  * Distribute freely, mark modified copies as such.
  */

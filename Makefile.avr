@@ -1,10 +1,11 @@
 CC=avr-gcc
-CFLAGS=-Wall -std=c99 -pedantic -Wextra -Wno-unknown-pragmas -Os
+CFLAGS=-Wall -std=c99 -pedantic -Wextra -Wno-unused-parameter -Wno-unknown-pragmas -Os
 LDFLAGS=-Os
 AR=avr-ar
 ARFLAGS=rcs
+OBJCOPY=avr-objcopy
 
-AVR_FLAGS=-DIHEX_DISABLE_SEGMENTS -DIHEX_LINE_MAX_LENGTH=32
+AVR_FLAGS=-DIHEX_DISABLE_SEGMENTS=1 -DIHEX_LINE_MAX_LENGTH=64
 
 OBJPATH = ./avr/
 OBJS = $(OBJPATH)kk_ihex_write.o $(OBJPATH)kk_ihex_read.o

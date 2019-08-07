@@ -3,7 +3,7 @@
  *
  * See the header `kk_ihex.h` for instructions.
  *
- * Copyright (c) 2013-2017 Kimmo Kulovesi, http://arkku.com/
+ * Copyright (c) 2013-2019 Kimmo Kulovesi, https://arkku.com/
  * Provided with absolutely no warranty, use at your own risk only.
  * Use and distribute freely, mark modified copies as such.
  */
@@ -119,6 +119,8 @@ ihex_read_byte (struct ihex_state * const ihex, const char byte) {
     } else {
         // low nybble, combine with stored high nybble:
         b = (ihex->data[len] |= b);
+        // We already know the lowest bit of `state`, dropping it may produce
+        // smaller code, hence the `>> 1` in switch and its cases.
         switch (state >> 1) {
         default:
             // remain in initial state while waiting for :

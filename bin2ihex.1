@@ -1,4 +1,4 @@
-.Dd February 1, 2014
+.Dd August 7, 2019
 .Dt bin2ihex 1
 .Os kk_ihex
 .Sh NAME
@@ -28,6 +28,10 @@ instead of standard input
 Write the Intel HEX output to
 .Ar file
 instead of standard output
+.It Fl b Ar length
+Set each output line to be formed by encoding
+.Ar length
+input bytes into IHEX (default 32)
 .It Fl v
 Print extra status messages to standard error
 .El
@@ -72,4 +76,4 @@ argument to obtain a binary file identical to the original.
 .Sh SEE ALSO
 .Xr ihex2bin 1
 .Sh AUTHOR
-.An "Kimmo Kulovesi" Aq http://arkku.com
+.An "Kimmo Kulovesi" Aq https://arkku.com

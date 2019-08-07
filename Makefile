@@ -7,7 +7,7 @@ ARFLAGS=rcs
 OBJS = kk_ihex_write.o kk_ihex_read.o bin2ihex.o ihex2bin.o
 BINPATH = ./
 LIBPATH = ./
-BINS = $(BINPATH)bin2ihex $(BINPATH)ihex2bin
+BINS = $(BINPATH)bin2ihex $(BINPATH)ihex2bin $(BINPATH)split16bit $(BINPATH)merge16bit
 LIB = $(LIBPATH)libkk_ihex.a
 TESTFILE = $(LIB)
 TESTER = 
@@ -31,6 +31,12 @@ $(BINPATH)bin2ihex: bin2ihex.o $(LIB)
 
 $(BINPATH)ihex2bin: ihex2bin.o $(LIB)
 	$(CC) $(LDFLAGS) -o $@ $+
+
+$(BINPATH)split16bit: split16bit.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $+
+
+$(BINPATH)merge16bit: merge16bit.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $+
 
 $(sort $(BINPATH) $(LIBPATH)):
 	@mkdir -p $@

@@ -1,0 +1,54 @@
+.Dd August 7, 2019
+.Dt merge16bit 1
+.Os kk_ihex
+.Sh NAME
+.Nm merge16bit
+.Nd Merges two 8-bit halves of a ROM image into one 16-bit file.
+.Sh SYNOPSIS
+.Nm
+.Op Fl o Ar output16bit.bin
+.Op Fl h Ar high8bit.bin
+.Op Fl l Ar low8bit.bin
+.Sh DESCRIPTION
+.Nm
+reads two raw 8-bit binary files as input, and writes alternating bytes
+from the low and high input files to combine them into a single 16-bit
+output binary. This is used to merge two 8-bit ROM images into a single
+16-bit file. The first byte of the output is taken from the low
+input file, i.e., the data is treated as little-endian.
+.Sh OPTIONS
+.Bl -tag -width -indent
+.It Fl l Ar lowfile
+Read the low half of the input from 
+.Ar lowfile
+.It Fl h Ar highfile
+Read the high half of the input from
+.Ar highfile
+.It Fl o Ar file
+Write the merged output to
+.Ar file
+instead of standard output
+.El
+.Sh EXAMPLES
+Write
+.Ar output.bin
+by combining the low and high halves of each 16-bit word from
+.Ar low.bin
+and
+.Ar high.bin
+respectively:
+.Pp
+.Bd -ragged -offset indent
+.Nm
+.Fl o
+.Ar output.bin
+.Fl l
+.Ar low.bin
+.Fl h
+.Ar high.bin
+.Ed
+.Pp
+.Sh SEE ALSO
+.Xr split16bit 1
+.Sh AUTHOR
+.An "Kimmo Kulovesi" Aq https://arkku.com

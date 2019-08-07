@@ -7,7 +7,7 @@
  * `-a` (also, `-a 0` forces output of the initial offset even
  * though it is the default zero).
  *
- * Copyright (c) 2013-2015 Kimmo Kulovesi, http://arkku.com
+ * Copyright (c) 2013-2019 Kimmo Kulovesi, https://arkku.com
  * Provided with absolutely no warranty, use at your own risk only.
  * Distribute freely, mark modified copies as such.
  */
@@ -31,6 +31,7 @@ main (int argc, char *argv[]) {
     struct ihex_state ihex;
     FILE *infile = stdin;
     ihex_address_t initial_address = 0;
+    uint8_t line_length = IHEX_DEFAULT_OUTPUT_LINE_LENGTH;
     bool write_initial_address = 0;
     bool debug_enabled = 0;
     ihex_count_t count;
@@ -65,6 +66,18 @@ main (int argc, char *argv[]) {
                     goto argument_error;
                 }
                 break;
+            case 'b':
+                if (--argc == 0) {
+                    goto invalid_argument;
+                }
+                ++argv;
+                errno = 0;
+                line_length = (uint8_t) strtoul(*argv, &arg, 0);
+                if (errno || arg == *argv || !line_length || line_length > IHEX_MAX_OUTPUT_LINE_LENGTH) {
+                    errno = errno ? errno : EINVAL;
+                    goto argument_error;
+                }
+                break;
             case 'o':
                 if (--argc == 0) {
                     goto invalid_argument;
@@ -90,9 +103,9 @@ invalid_argument:
         (void) fprintf(stderr, "Invalid argument: %s\n", arg);
 usage:
         (void) fprintf(stderr, "kk_ihex " KK_IHEX_VERSION
-                               " - Copyright (c) 2013-2015 Kimmo Kulovesi\n");
+                               " - Copyright (c) 2013-2019 Kimmo Kulovesi\n");
         (void) fprintf(stderr, "Usage: bin2ihex [-a <address_offset>]"
-                               " [-o <out.hex>] [-i <in.bin>] [-v]\n");
+                               " [-o <out.hex>] [-i <in.bin>] [-b <length>] [-v]\n");
         return arg ? EXIT_FAILURE : EXIT_SUCCESS;
 argument_error:
         perror(*argv);
@@ -106,6 +119,7 @@ argument_error:
         ihex_write_buffer = buffer;
 #endif
         ihex_init(&ihex);
+        ihex_set_output_line_length(&ihex, line_length);
         ihex_write_at_address(&ihex, initial_address);
         if (write_initial_address) {
             if (debug_enabled) {
@@ -118,6 +132,9 @@ argument_error:
             ihex_write_bytes(&ihex, buf, count);
         }
         ihex_end_write(&ihex);
+#ifdef IHEX_EXTERNAL_WRITE_BUFFER
+        ihex_write_buffer = NULL;
+#endif
     }
 
     if (outfile != stdout) {

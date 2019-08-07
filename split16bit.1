@@ -1,0 +1,55 @@
+.Dd August 7, 2019
+.Dt split16bit 1
+.Os kk_ihex
+.Sh NAME
+.Nm split16bit
+.Nd Splits a 16-bit ROM image into two 8-bit halves.
+.Sh SYNOPSIS
+.Nm
+.Op Fl i Ar input16bit.bin
+.Op Fl h Ar high8bit.bin
+.Op Fl l Ar low8bit.bin
+.Sh DESCRIPTION
+.Nm
+reads a raw 16-bit binary file from standard input and writes two
+its two 8-bit halves into separate output files. The low half
+will contain the first byte of input, since it has the lowest address,
+i.e., the input is treated as little-endian.
+.Sh OPTIONS
+.Bl -tag -width -indent
+.It Fl h Ar highfile
+Output to 
+.Ar highfile
+the high half of each 16-bit word
+.It Fl l Ar lowfile
+Output to 
+.Ar lowfile
+the low half of each 16-bit word
+.It Fl i Ar file
+Read the binary input from
+.Ar file
+instead of standard input
+.El
+.Sh EXAMPLES
+Read binary data from
+.Ar input.bin
+and write low and high halves of each input word to
+.Ar low.bin
+and
+.Ar high.bin
+respectively:
+.Pp
+.Bd -ragged -offset indent
+.Nm
+.Fl i
+.Ar input.bin
+.Fl l
+.Ar low.bin
+.Fl h
+.Ar high.bin
+.Ed
+.Pp
+.Sh SEE ALSO
+.Xr merge16bit 1
+.Sh AUTHOR
+.An "Kimmo Kulovesi" Aq https://arkku.com
