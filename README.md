@@ -120,19 +120,32 @@ even gigabytes.
 Utilities
 =========
 
-Two additional utilities are provided to help working with ROM images:
+Four additional utilities are provided to help working with ROM images:
 
 * `split16bit` – splits a 16-bit ROM binary into two 8-bit halves
 * `merge16bit` – merges two 8-bit ROM binary halves into a single 16-bit file
+* `split32bit` – splits a 32-bit ROM binary into four 8-bit parts
+* `merge32bit` – merges four 8-bit ROM binary parts into a single 32-bit file
 
-Both of these take the filenames of the high and low halves with the
-arguments `-l low.bin` and `-h high.bin`, respectively. For example:
+Both 16-bit utilities take the filenames of the high and low halves with the
+arguments `-l low.bin` and `-h high.bin`, respectively. The bytes are in
+little endian order, i.e., the one with the lowest address is the "low" half.
 
     # Split 16bit.bin into low.bin and high.bin:
     split16bit -i 16bit.bin -l low.bin -h high.bin
 
     # Merge low.bin and high.bin into 16bit.bin:
     merge16bit -o 16bit.bin -l low.bin -h high.bin
+
+Both 32-bit utilities take the filenames of the four 8-bit files with the
+arguments `-0`, `-1`, `-2`, and `-3`, with byte 0 being the one with the
+lowest address, i.e., the bytes are in little endian order.
+
+    # Split 32bit.bin into a.bin, b.bin, c.bin, and d.bin
+    split32bit -i 32bit.bin -0 a.bin -1 b.bin -2 c.bin -3 d.bin
+
+    # Merge a.bin, b.bin, c.bin, and d.bin into 32bit.bin
+    merge32bit -o 32bit.bin -0 a.bin -1 b.bin -2 c.bin -3 d.bin
 
 These utilities have nothing to with IHEX as such, but they are so small that
 it didn't seem worth the bother to release them separately.
