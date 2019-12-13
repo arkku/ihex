@@ -1,10 +1,11 @@
 /*
- * split16bit.c: Split a 16-bit ROM binary into two 8-bit images.
+ * merge32bit.c: Merge four 8-bit files into a single 32-bit file.
  *
- * The command-line option `-i` specifies the input file, which should
- * be a 16-bit binary ROM image (raw data), and the options `-h` and
- * `-l` specify the high and low output files, respectively. Input is
- * read from `stdin` by default.
+ * The command-line option `-o` specifies the output file, and the options
+ * `-0`, `-1`, `-2`, and `-3` specify the input files. The output file is
+ * created by alternately writing one byte from each input file. This can
+ * be used to merge a 32-bit ROM image that has been split into four 8-bit
+ * images into a a single 32-bit file.
  *
  * Copyright (c) 2019 Kimmo Kulovesi, https://arkku.com
  * Provided with absolutely no warranty, use at your own risk only.
@@ -19,42 +20,38 @@
 
 int
 main (int argc, char *argv[]) {
-    FILE *infile = stdin;
-    FILE *outhigh = NULL;
-    FILE *outlow = NULL;
+    int i;
+    FILE *outfile = stdout;
+    FILE *infile[4] = { NULL };
     char *arg = NULL;
 
     while (--argc) {
         arg = *(++argv);
         if (arg[0] == '-' && arg[1] && arg[2] == '\0') {
             switch (arg[1]) {
-            case 'i':
+            case 'o':
                 if (--argc == 0) {
                     goto invalid_argument;
                 }
                 ++argv;
-                if (!(infile = fopen(*argv, "rb"))) {
+                if (!(outfile = fopen(*argv, "wb"))) {
                     goto argument_error;
                 }
                 break;
-            case 'h':
+            case '3':
+            case '2':
+            case '1':
+            case '0': {
+                int byte_number = arg[1] - '0';
                 if (--argc == 0) {
                     goto invalid_argument;
                 }
                 ++argv;
-                if (!(outhigh = fopen(*argv, "wb"))) {
+                if (!(infile[byte_number] = fopen(*argv, "rb"))) {
                     goto argument_error;
                 }
                 break;
-            case 'l':
-                if (--argc == 0) {
-                    goto invalid_argument;
-                }
-                ++argv;
-                if (!(outlow = fopen(*argv, "wb"))) {
-                    goto argument_error;
-                }
-                break;
+            }
             case '?':
                 arg = NULL;
                 goto usage;
@@ -66,45 +63,42 @@ main (int argc, char *argv[]) {
 invalid_argument:
         (void) fprintf(stderr, "Invalid argument: %s\n", arg);
 usage:
-        (void) fprintf(stderr, "split16bit - Copyright (c) 2019 Kimmo Kulovesi\n");
-        (void) fprintf(stderr, "Usage: split16bit [-i <in.bin>] <-h highfile> <-l lowfile>\n");
+        (void) fprintf(stderr, "merge32bit - Copyright (c) 2019 Kimmo Kulovesi\n");
+        (void) fprintf(stderr, "Usage: merge32bit [-o <out.bin>] <-{0,1,2,3} inN.bin>\n");
         return arg ? EXIT_FAILURE : EXIT_SUCCESS;
 argument_error:
         perror(*argv);
         return EXIT_FAILURE;
     }
 
-    if (!(outhigh && outlow)) {
+    if (!(infile[0] && infile[1] && infile[2] && infile[3])) {
         arg = "";
         goto usage;
     }
 
     errno = 0;
     for (;;) {
-        int byte = fgetc(infile);
-        if (byte == EOF) {
-            break;
-        }
-        if (fputc(byte, outlow) == EOF) {
-            break;
-        }
-        byte = fgetc(infile);
-        if (byte == EOF) {
-            break;
-        }
-        if (fputc(byte, outhigh) == EOF) {
-            break;
+        for (i = 0; i < 4; ++i) {
+            int byte = fgetc(infile[i]);
+            if (byte == EOF) {
+                goto end_read;
+            }
+            if (fputc(byte, outfile) == EOF) {
+                goto end_read;
+            }
         }
     }
+end_read:
 
     if (errno) {
         perror("Error");
     }
 
-    (void) fclose(outhigh);
-    (void) fclose(outlow);
-    if (infile != stdin) {
-        (void) fclose(infile);
+    for (i = 0; i < 4; ++i) {
+        (void) fclose(infile[i]);
+    }
+    if (outfile != stdin) {
+        (void) fclose(outfile);
     }
 
     return errno ? EXIT_FAILURE : EXIT_SUCCESS;

@@ -2,8 +2,8 @@
 *.a
 bin2ihex
 ihex2bin
-split16bit
-merge16bit
+split*bit
+merge*bit
 *.hex
 *.bin
 xcuserdata

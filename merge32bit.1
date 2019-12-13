@@ -1,0 +1,66 @@
+.Dd December 13, 2019
+.Dt merge32bit 1
+.Os kk_ihex
+.Sh NAME
+.Nm merge32bit
+.Nd Merges a 32-bit ROM image into four 8-bit files.
+.Sh SYNOPSIS
+.Nm
+.Op Fl 0 Ar in0.bin
+.Op Fl 1 Ar in1.bin
+.Op Fl 2 Ar in2.bin
+.Op Fl 3 Ar in3.bin
+.Op Fl o Ar output32bit.bin
+.Sh DESCRIPTION
+.Nm
+reads bytes alternately from four input files and writes them to a
+single output file. Each 32-bit dword of output will thus have one
+byte from each input file. The bytes are numbered from 0 to 3 by
+address, i.e., the first byte of output is from input file 0
+(little endian).
+.Sh OPTIONS
+.Bl -tag -width -indent
+.It Fl 0 Ar byte0file
+Read the first byte of each output word from
+.Ar byte0file
+.It Fl 1 Ar byte1file
+Read the second byte of each output word from
+.Ar byte1file
+.It Fl 2 Ar byte2file
+Read the third byte of each output word from
+.Ar byte2file
+.It Fl 3 Ar byte3file
+Read the fourth byte of each output word from
+.Ar byte3file
+.It Fl i Ar file
+Write the 32-bit output to
+.Ar file
+instead of standard output
+.El
+.Sh EXAMPLES
+Write the output to
+.Ar be32.bin
+and read the bytes for each 32-bit output dword from the files
+.Ar U1.bin
+to
+.Ar U4.bin
+in big endian order:
+.Pp
+.Bd -ragged -offset indent
+.Nm
+.Fl o
+.Ar be32.bin
+.Fl 0
+.Ar U4.bin
+.Fl 1
+.Ar U3.bin
+.Fl 2
+.Ar U2.bin
+.Fl 3
+.Ar U1.bin
+.Ed
+.Pp
+.Sh SEE ALSO
+.Xr split32bit 1
+.Sh AUTHOR
+.An "Kimmo Kulovesi" Aq https://arkku.com

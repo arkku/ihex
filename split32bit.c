@@ -1,10 +1,10 @@
 /*
- * split16bit.c: Split a 16-bit ROM binary into two 8-bit images.
+ * split32bit.c: Split a 32-bit ROM binary into four 8-bit images.
  *
  * The command-line option `-i` specifies the input file, which should
- * be a 16-bit binary ROM image (raw data), and the options `-h` and
- * `-l` specify the high and low output files, respectively. Input is
- * read from `stdin` by default.
+ * be a 32-bit binary ROM image (raw data), and the options `-0`, `-1`,
+ * `-2`, and `-3` specify the output files for each of the four bytes
+ * that make up the 32-bit dword.
  *
  * Copyright (c) 2019 Kimmo Kulovesi, https://arkku.com
  * Provided with absolutely no warranty, use at your own risk only.
@@ -19,9 +19,9 @@
 
 int
 main (int argc, char *argv[]) {
+    int i;
     FILE *infile = stdin;
-    FILE *outhigh = NULL;
-    FILE *outlow = NULL;
+    FILE *outfile[4] = { NULL };
     char *arg = NULL;
 
     while (--argc) {
@@ -33,28 +33,24 @@ main (int argc, char *argv[]) {
                     goto invalid_argument;
                 }
                 ++argv;
-                if (!(infile = fopen(*argv, "rb"))) {
+                if (!(infile = fopen(*argv, "r"))) {
                     goto argument_error;
                 }
                 break;
-            case 'h':
+            case '3':
+            case '2':
+            case '1':
+            case '0': {
+                int byte_number = arg[1] - '0';
                 if (--argc == 0) {
                     goto invalid_argument;
                 }
                 ++argv;
-                if (!(outhigh = fopen(*argv, "wb"))) {
+                if (!(outfile[byte_number] = fopen(*argv, "wb"))) {
                     goto argument_error;
                 }
                 break;
-            case 'l':
-                if (--argc == 0) {
-                    goto invalid_argument;
-                }
-                ++argv;
-                if (!(outlow = fopen(*argv, "wb"))) {
-                    goto argument_error;
-                }
-                break;
+            }
             case '?':
                 arg = NULL;
                 goto usage;
@@ -66,43 +62,40 @@ main (int argc, char *argv[]) {
 invalid_argument:
         (void) fprintf(stderr, "Invalid argument: %s\n", arg);
 usage:
-        (void) fprintf(stderr, "split16bit - Copyright (c) 2019 Kimmo Kulovesi\n");
-        (void) fprintf(stderr, "Usage: split16bit [-i <in.bin>] <-h highfile> <-l lowfile>\n");
+        (void) fprintf(stderr, "split32bit - Copyright (c) 2019 Kimmo Kulovesi\n");
+        (void) fprintf(stderr, "Usage: split32bit [-i <in.bin>] <-{0,1,2,3} outN.bin>\n");
         return arg ? EXIT_FAILURE : EXIT_SUCCESS;
 argument_error:
         perror(*argv);
         return EXIT_FAILURE;
     }
 
-    if (!(outhigh && outlow)) {
+    if (!(outfile[0] && outfile[1] && outfile[2] && outfile[3])) {
         arg = "";
         goto usage;
     }
 
     errno = 0;
     for (;;) {
-        int byte = fgetc(infile);
-        if (byte == EOF) {
-            break;
-        }
-        if (fputc(byte, outlow) == EOF) {
-            break;
-        }
-        byte = fgetc(infile);
-        if (byte == EOF) {
-            break;
-        }
-        if (fputc(byte, outhigh) == EOF) {
-            break;
+        for (i = 0; i < 4; ++i) {
+            int byte = fgetc(infile);
+            if (byte == EOF) {
+                goto end_read;
+            }
+            if (fputc(byte, outfile[i]) == EOF) {
+                goto end_read;
+            }
         }
     }
+end_read:
 
     if (errno) {
         perror("Error");
     }
 
-    (void) fclose(outhigh);
-    (void) fclose(outlow);
+    for (i = 0; i < 4; ++i) {
+        (void) fclose(outfile[i]);
+    }
     if (infile != stdin) {
         (void) fclose(infile);
     }

@@ -8,6 +8,7 @@ OBJS = kk_ihex_write.o kk_ihex_read.o bin2ihex.o ihex2bin.o
 BINPATH = ./
 LIBPATH = ./
 BINS = $(BINPATH)bin2ihex $(BINPATH)ihex2bin $(BINPATH)split16bit $(BINPATH)merge16bit
+BINS += $(BINPATH)split32bit $(BINPATH)merge32bit
 LIB = $(LIBPATH)libkk_ihex.a
 TESTFILE = $(LIB)
 TESTER = 
@@ -34,6 +35,12 @@ $(BINPATH)split16bit: split16bit.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $+
 
 $(BINPATH)merge16bit: merge16bit.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $+
+
+$(BINPATH)split32bit: split32bit.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $+
+
+$(BINPATH)merge32bit: merge32bit.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $+
 
 $(sort $(BINPATH) $(LIBPATH)):
